@@ -4,7 +4,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 import listarestrutura as lt
 import time
 
-prompts_testados = 1
+prompts_testados = 0
 #estrutura = lt.listar_estrutura("https://github.com/Mintplex-Labs/anything-llm") quando quiser listar a estrutura do repositório
 
 # Exibe uso de memória
@@ -23,7 +23,7 @@ def executarModelo(input_text):
    inputs = tokenizer(texto_avaliado, return_tensors="pt").to(model.device)
   
    tempo_execucao = time.perf_counter()
-   outputs = model.generate(**inputs, max_new_tokens=1000, temperature=0.1, top_p=0.9)
+   outputs = model.generate(**inputs, max_new_tokens=700, temperature=0.15, top_p=0.9)
    tempo_execucao = time.perf_counter() - tempo_execucao
 
    # Decodifica o texto completo
@@ -39,7 +39,7 @@ def executarModelo(input_text):
 model_path = r"F:\Windows 3.0\Downloads\Teste 1\Llama-3.2-1B-Instruct"  #Utilizei um modelo baixado localmente
 
 print("Carregando modelo local:", model_path)
-
+device = "cpu"
 # Detecta GPU disponível
 if torch.cuda.is_available():
    device = "cuda"
