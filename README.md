@@ -25,3 +25,66 @@ Este repositório destina-se a conter os dados necessários para a análise de p
 - Llama-3.2-1B-Instruct
 - Qwen2.5-Coder-1.5B-Instruct
 - all-MiniLM-L6-v2
+
+# Tutorial de Instalação e Execução do Modelo
+
+## 1. Dependências Necessárias
+
+Antes de iniciar, verifique se o ambiente possui os seguintes componentes instalados:
+
+- Python 3.12
+- transformers
+- torch
+- accelerate
+
+---
+
+## 2. Criando e Ativando o Ambiente Virtual (venv)
+
+### Windows
+```bash
+python -m venv venv
+venv\Scripts\activate
+```
+
+### Linux / MacOS
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+---
+
+## 3. Instalando as Dependências
+
+Com o ambiente virtual ativado:
+
+```bash
+pip install -q transformers torch accelerate
+```
+
+---
+
+## 4. Importando as Bibliotecas
+
+```python
+import os
+import torch
+import time
+from transformers import AutoTokenizer, AutoModelForCausalLM
+
+```
+---
+## 4.1 Colab (Adicional)
+```
+from IPython.display import clear_output
+from google.colab import drive 
+```
+## 5. Executando o Script
+
+```bash
+python seu_script.py
+```
+
+Seu ambiente está pronto para rodar modelos!
+
