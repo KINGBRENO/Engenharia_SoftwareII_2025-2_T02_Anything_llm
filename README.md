@@ -15,7 +15,7 @@ Este repositório destina-se a conter os dados necessários para a análise de p
 - JOÃO VINÍCIUS DE ALMEIDA ARGOLO - [202200025573]
 - JOSÉ ARTHUR CALIXTO DA ROCHA COSTA - [202300038770]
 - VINÍCIUS AZEVEDO PEROBA - [201900076892]
-- VINÍCIUS AZEVEDO PEROBA - [202300027740]
+- WENDEL ALEXSANDER GOMES MENEZES - [202300027740]
 
 ## 🔗 Repositório Original
 - **[AnythingLLM](https://github.com/Mintplex-Labs/anything-llm)** - Repositório analisado no projeto
