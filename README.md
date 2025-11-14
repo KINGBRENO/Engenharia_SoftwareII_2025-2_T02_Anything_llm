@@ -25,6 +25,7 @@ Este repositório destina-se a conter os dados necessários para a análise de p
 - Llama-3.2-1B-Instruct
 - Qwen2.5-Coder-1.5B-Instruct
 - all-MiniLM-L6-v2
+- bart-large-mnli
 
 # Tutorial de Instalação e Execução do Modelo
 
