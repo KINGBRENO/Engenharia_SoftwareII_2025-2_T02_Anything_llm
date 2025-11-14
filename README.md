@@ -4,8 +4,8 @@
 Este repositório destina-se a conter os dados necessários para a análise de padrões arquiteturais do repositório AnythingLLM utilizando modelos do Hugging Face para identificação de padrões e estruturas de software.
 
 ## 📚 Documentação
-- **[Fundamentação Teórica e Metodologia](https://docs.google.com/document/d/1R-D4VtqfLO1I6LkJB5Rm5mj4UGxH5rFzmwhnGCyFdDc/edit?usp=sharing)** - Base teórica, metodologia e referências
-- **[Tutorial Prático](https://docs.google.com/document/d/1IlnZnfeqwm33-1T7Oq_By6wTV-1whWtv88dz1jKWHtg/edit?usp=sharing)** - Guia passo a passo para testar os modelos
+- **[Fundamentação Teórica, Metodologia e Tutorial Prático](https://docs.google.com/document/d/1R-D4VtqfLO1I6LkJB5Rm5mj4UGxH5rFzmwhnGCyFdDc/edit?usp=sharing)** - Base teórica, metodologia e referências passo a passo para testar os modelos
+- ** [Vídeo] (https://drive.google.com/file/d/1UpEBQt0Kr69DkKJRE-8FYGiUIMkKEoov/view) - Vídeo da apresentação
 
 ## 👥 Integrantes
 - BRENO HENRIQUE DO CARMO SANTOS - [202200078737]
