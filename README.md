@@ -4,8 +4,8 @@
 Este repositório destina-se a conter os dados necessários para a análise de padrões arquiteturais do repositório AnythingLLM utilizando modelos do Hugging Face para identificação de padrões e estruturas de software.
 
 ## 📚 Documentação
-- **[Fundamentação Teórica, Metodologia e Tutorial Prático](https://docs.google.com/document/d/1R-D4VtqfLO1I6LkJB5Rm5mj4UGxH5rFzmwhnGCyFdDc/edit?usp=sharing)** - Base teórica, metodologia e referências passo a passo para testar os modelos
-- ** [Vídeo] (https://drive.google.com/file/d/1UpEBQt0Kr69DkKJRE-8FYGiUIMkKEoov/view) - Vídeo da apresentação
+- **[Fundamentação Teórica e Metodologia](https://docs.google.com/document/d/1R-D4VtqfLO1I6LkJB5Rm5mj4UGxH5rFzmwhnGCyFdDc/edit?usp=sharing)** - Base teórica, metodologia e referências
+- **[Tutorial Prático](https://docs.google.com/document/d/1IlnZnfeqwm33-1T7Oq_By6wTV-1whWtv88dz1jKWHtg/edit?usp=sharing)** - Guia passo a passo para testar os modelos
 
 ## 👥 Integrantes
 - BRENO HENRIQUE DO CARMO SANTOS - [202200078737]
@@ -15,79 +15,8 @@ Este repositório destina-se a conter os dados necessários para a análise de p
 - JOÃO VINÍCIUS DE ALMEIDA ARGOLO - [202200025573]
 - JOSÉ ARTHUR CALIXTO DA ROCHA COSTA - [202300038770]
 - VINÍCIUS AZEVEDO PEROBA - [201900076892]
-- WENDEL ALEXSANDER GOMES MENEZES - [202300027740]
+- VINÍCIUS AZEVEDO PEROBA - [202300027740]
 
 ## 🔗 Repositório Original
 - **[AnythingLLM](https://github.com/Mintplex-Labs/anything-llm)** - Repositório analisado no projeto
-
-- Utiliza-se os modelos 
-- bart-large-cnn
-- Llama-3.2-1B-Instruct
-- Qwen2.5-Coder-1.5B-Instruct
-- all-MiniLM-L6-v2
-- bart-large-mnli
-
-# Tutorial de Instalação e Execução do Modelo
-
-## 1. Dependências Necessárias
-
-Antes de iniciar, verifique se o ambiente possui os seguintes componentes instalados:
-
-- Python 3.12
-- transformers
-- torch
-- accelerate
-
----
-
-## 2. Criando e Ativando o Ambiente Virtual (venv)
-
-### Windows
-```bash
-python -m venv venv
-venv\Scripts\activate
-```
-
-### Linux / MacOS
-```bash
-python3 -m venv venv
-source venv/bin/activate
-```
-
----
-
-## 3. Instalando as Dependências
-
-Com o ambiente virtual ativado:
-
-```bash
-pip install -q transformers torch accelerate
-pip install torch torchvision torchaudio --index-url 
-pip install transformers accelerate tokenizers sentencepiece bitsandbytes huggingface-hub safetensors
-```
-
----
-
-## 4. Importando as Bibliotecas
-
-```python
-import os
-import torch
-import time
-from transformers import AutoTokenizer, AutoModelForCausalLM
-
-```
----
-## 4.1 Colab (Adicional)
-```
-from IPython.display import clear_output
-from google.colab import drive 
-```
-## 5. Executando o Script
-
-```bash
-python seu_script.py
-```
-
-Seu ambiente está pronto para rodar modelos!
 

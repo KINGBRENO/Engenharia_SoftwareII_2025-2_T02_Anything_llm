@@ -1,0 +1,1781 @@
+
+
+===== C:\Users\Breno\AppData\Local\Temp\repo_1u3zfsju\repo\BARE_METAL.md =====
+Run AnythingLLM in production without Docker
+[!WARNING]
+This method of deployment is **not supported** by the core-team and is to be used as a reference for your deployment.
+You are fully responsible for securing your deployment and data in this mode.
+**Any issues** experienced from bare-metal or non-containerized deployments will be **not** answered or supported.
+Here you can find the scripts and known working process to run AnythingLLM outside of a Docker container.
+Minimum Requirements
+[!TIP]
+You should aim for at least 2GB of RAM. Disk storage is proportional to however much data
+you will be storing (documents, vectors, models, etc). Minimum 10GB recommended.
+NodeJS v18
+Yarn
+Getting started
+1. Clone the repo into your server as the user who the application will run as.
+`git clone git@github.com:Mintplex-Labs/anything-llm.git`
+2. `cd anything-llm` and run `yarn setup`. This will install all dependencies to run in production as well as debug the application.
+3. `cp server/.env.example server/.env` to create the basic ENV file for where instance settings will be read from on service start.
+4. Ensure that the `server/.env` file has _at least_ these keys to start. These values will persist and this file will be automatically written and managed after your first successful boot.
+5. Edit the `frontend/.env` file for the `VITE_BASE_API` to now be set to `/api`. This is documented in the .env for which one you should use.
+To start the application
+AnythingLLM is comprised of three main sections. The `frontend`, `server`, and `collector`. When running in production you will be running `server` and `collector` on two different processes, with a build step for compilation of the frontend.
+1. Build the frontend application.
+`cd frontend && yarn build` - this will produce a `frontend/dist` folder that will be used later.
+2. Copy `frontend/dist` to `server/public` - `cp -R frontend/dist server/public`.
+This should create a folder in `server` named `public` which contains a top level `index.html` file and various other files/folders.
+3. Migrate and prepare your database file.
+4. Boot the server in production
+`cd server && NODE_ENV=production node index.js &`
+5. Boot the collection in another process
+`cd collector && NODE_ENV=production node index.js &`
+AnythingLLM should now be running on `
+Updating AnythingLLM
+To update AnythingLLM with future updates you can `git pull origin master` to pull in the latest code and then repeat steps 2 - 5 to deploy with all changes fully.
+_note_ You should ensure that each folder runs `yarn` again to ensure packages are up to date in case any dependencies were added, changed, or removed.
+_note_ You should `pkill node` before running an update so that you are not running multiple AnythingLLM processes on the same instance as this can cause conflicts.
+Example update script
+Using Nginx?
+If you are using Nginx, you can use the following example configuration to proxy the requests to the server. Chats for streaming require **websocket** connections, so you need to ensure that the Nginx configuration is set up to support websockets. You can do this with a simple reverse proxy configuration.
+
+
+===== C:\Users\Breno\AppData\Local\Temp\repo_1u3zfsju\repo\CONTRIBUTING.md =====
+Contributing to AnythingLLM
+AnythingLLM is an open-source project and we welcome contributions from the community.
+Reporting Issues
+If you encounter a bug or have a feature request, please open an issue on the
+GitHub issue tracker.
+Picking an issue
+We track issues on the GitHub issue tracker. If you are looking for something to
+work on, check the good first issue label. These issues are typically the best described and have the smallest scope. There may be issues that are not labeled as good first issue, but are still a good starting point.
+If there's an issue you are interested in working on, please leave a comment on the issue. This will help us avoid duplicate work. Additionally, if you have questions about the issue, please ask them in the issue comments. We are happy to provide guidance on how to approach the issue.
+Before you start
+Keep in mind that we are a small team and have limited resources. We will do our best to review and merge your PRs, but please be patient. Ultimately, **we become the maintainer** of your changes. It is our responsibility to make sure that the changes are working as expected and are of high quality as well as being compatible with the rest of the project both for existing users and for future users & features.
+Before you start working on an issue, please read the following so that you don't waste time on something that is not a good fit for the project or is more suitable for a personal fork. We would rather answer a comment on an issue than close a PR after you've spent time on it. Your time is valuable and we appreciate your time and effort to make AnythingLLM better.
+0. (most important) If you are making a PR that does not have a corresponding issue, **it will not be merged.** _The only exception to this is language translations._
+1. If you are modifying the permission system for a new role or something custom, you are likely better off forking the project and building your own version since this is a core part of the project and is only to be maintained by the AnythingLLM team.
+2. Integrations (LLM, Vector DB, etc.) are reviewed at our discretion. We will eventually get to them. Do not expect us to merge your integration PR instantly since there are often many moving parts and we want to make sure we get it right. We will get to it!
+3. It is our discretion to merge or not merge a PR. We value every contribution, but we also value the quality of the code and the user experience we envision for the project. It is a fine line to walk when running a project like this and please understand that merging or not merging a PR is not a reflection of the quality of the contribution and is not personal. We will do our best to provide feedback on the PR and help you make the changes necessary to get it merged.
+4. **Security** is always important. If you have a security concern, please do not open an issue. Instead, please open a CVE on our designated reporting platform Huntr or contact us at team@mintplexlabs.com.
+Configuring Git
+First, fork the repository on GitHub, then clone your fork:
+Then add the main repository as a remote:
+Setting up your development environment
+In the root of the repository, run:
+This will install the dependencies, set up the proper and expected ENV files for the project, and run the prisma setup script.
+Next, run:
+This will start the server, frontend, and collector in development mode. Changes to the code will be hot reloaded.
+Best practices for pull requests
+For the best chance of having your pull request accepted, please follow these guidelines:
+1. Unit test all bug fixes and new features. Your code will not be merged if it
+ doesn't have tests.
+1. If you change the public API, update the documentation in the `anythingllm-docs` repository.
+1. Aim to minimize the number of changes in each pull request. Keep to solving
+ one problem at a time, when possible.
+1. Before marking a pull request ready-for-review, do a self review of your code.
+ Is it clear why you are making the changes? Are the changes easy to understand?
+1. Use conventional commit messages as pull request titles. Examples:
+ * New feature: `feat: adding foo API`
+ * Bug fix: `fix: issue with foo API`
+ * Documentation change: `docs: adding foo API documentation`
+1. If your pull request is a work in progress, leave the pull request as a draft.
+ We will assume the pull request is ready for review when it is opened.
+1. When writing tests, test the error cases. Make sure they have understandable
+ error messages.
+Project structure
+The core library is written in Node.js. There are additional sub-repositories for the embed widget and browser extension. These are not part of the core AnythingLLM project, but are maintained by the AnythingLLM team.
+`server`: Node.js server source code
+`frontend`: React frontend source code
+`collector`: Python collector source code
+Release process
+Changes to the core AnythingLLM project are released through the `master` branch. When a PR is merged into `master`, a new version of the package is published to Docker and GitHub Container Registry under the `latest` tag.
+When a new version is released, the following steps are taken a new image is built and pushed to Docker Hub and GitHub Container Registry under the assoicated version tag. Version tags are of the format `v<major>.<minor>.<patch>` and are pinned code, while `latest` is the latest version of the code at any point in time.
+Desktop propogation
+Changes to the desktop app are downstream of the core AnythingLLM project. Releases of the desktop app are published at the same time as the core AnythingLLM project. Code from the core AnythingLLM project is copied into the desktop app into an Electron wrapper. The Electron wrapper that wraps around the core AnythingLLM project is **not** part of the core AnythingLLM project, but is maintained by the AnythingLLM team.
+License
+By contributing to AnythingLLM (this repository), you agree to license your contributions under the MIT license.
+
+
+===== C:\Users\Breno\AppData\Local\Temp\repo_1u3zfsju\repo\pull_request_template.md =====
+### Pull Request Type
+<!-- For change type, change [ ] to [x]. -->
+[ ] ✨ feat
+[ ] 🐛 fix
+[ ] ♻️ refactor
+[ ] 💄 style
+[ ] 🔨 chore
+[ ] 📝 docs
+Relevant Issues
+<!-- Use "resolves #xxx" to auto resolve on merge. Otherwise, please use "connect #xxx" -->
+resolves #xxx
+What is in this change?
+<!-- Describe the changes in this PR that are impactful to the repo. -->
+Additional Information
+<!-- Add any other context about the Pull Request here that was not captured above. -->
+Developer Validations
+<!-- All of the applicable items should be checked. -->
+[ ] I ran `yarn lint` from the root of the repo & committed changes
+[ ] Relevant documentation has been updated
+[ ] I have tested my code functionality
+[ ] Docker build succeeds locally
+
+
+===== C:\Users\Breno\AppData\Local\Temp\repo_1u3zfsju\repo\README.md =====
+<a name="readme-top"></a>
+<p align="center">
+ <a href=" src=" alt="AnythingLLM logo"></a>
+</p>
+<div align='center'>
+<a href=" target="_blank"><img src=" alt="Mintplex-Labs%2Fanything-llm | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+</div>
+<p align="center">
+ <b>AnythingLLM:</b> The all-in-one AI app you were looking for.<br />
+ Chat with your docs, use AI Agents, hyper-configurable, multi-user, & no frustrating setup required.
+</p>
+<p align="center">
+ <a href=" target="_blank">
+ <img src=" alt="Discord">
+ </a> |
+ <a href=" target="_blank">
+ <img src=" alt="License">
+ </a> |
+ <a href=" target="_blank">
+ Docs
+ </a> |
+ <a href=" target="_blank">
+ Hosted Instance
+ </a>
+</p>
+<p align="center">
+ <b>English</b> · <a href='./locales/README.zh-CN.md'>简体中文</a> · <a href='./locales/README.ja-JP.md'>日本語</a>
+</p>
+<p align="center">
+👉 AnythingLLM for desktop (Mac, Windows, & Linux)! <a href=" target="_blank"> Download Now</a>
+</p>
+A full-stack application that enables you to turn any document, resource, or piece of content into context that any LLM can use as a reference during chatting. This application allows you to pick and choose which LLM or Vector Database you want to use as well as supporting multi-user management and permissions.
+<details>
+<summary><kbd>Watch the demo!</kbd></summary>
+[](
+</details>
+Product Overview
+AnythingLLM is a full-stack application where you can use commercial off-the-shelf LLMs or popular open source LLMs and vectorDB solutions to build a private ChatGPT with no compromises that you can run locally as well as host remotely and be able to chat intelligently with any documents you provide it.
+AnythingLLM divides your documents into objects called `workspaces`. A Workspace functions a lot like a thread, but with the addition of containerization of your documents. Workspaces can share documents, but they do not talk to each other so you can keep your context for each workspace clean.
+Cool features of AnythingLLM
+🆕 **Full MCP-compatibility**
+🆕 **No-code AI Agent builder**
+🖼️ **Multi-modal support (both closed and open-source LLMs!)**
+**Custom AI Agents**
+👤 Multi-user instance support and permissioning _Docker version only_
+🦾 Agents inside your workspace (browse the web, etc)
+💬 Custom Embeddable Chat widget for your website _Docker version only_
+📖 Multiple document type support (PDF, TXT, DOCX, etc)
+Simple chat UI with Drag-n-Drop functionality and clear citations.
+100% Cloud deployment ready.
+Works with all popular closed and open-source LLM providers.
+Built-in cost & time-saving measures for managing very large documents compared to any other chat UI.
+Full Developer API for custom integrations!
+Much more...install and find out!
+Supported LLMs, Embedder Models, Speech models, and Vector Databases
+Large Language Models (LLMs):**
+Any open-source llama.cpp compatible model
+OpenAI
+OpenAI (Generic)
+Azure OpenAI
+AWS Bedrock
+Anthropic
+NVIDIA NIM (chat models)
+Google Gemini Pro
+Hugging Face (chat models)
+Ollama (chat models)
+LM Studio (all models)
+LocalAI (all models)
+Together AI (chat models)
+Fireworks AI (chat models)
+Perplexity (chat models)
+OpenRouter (chat models)
+DeepSeek (chat models)
+Mistral
+Groq
+Cohere
+KoboldCPP
+LiteLLM
+Text Generation Web UI
+Apipie
+xAI
+Novita AI (chat models)
+PPIO
+Moonshot AI
+Microsoft Foundry Local
+CometAPI (chat models)
+Embedder models:**
+AnythingLLM Native Embedder (default)
+OpenAI
+Azure OpenAI
+LocalAI (all)
+Ollama (all)
+LM Studio (all)
+Cohere
+Audio Transcription models:**
+AnythingLLM Built-in (default)
+OpenAI
+TTS (text-to-speech) support:**
+Native Browser Built-in (default)
+PiperTTSLocal - runs in browser
+OpenAI TTS
+ElevenLabs
+Any OpenAI Compatible TTS service.
+STT (speech-to-text) support:**
+Native Browser Built-in (default)
+Vector Databases:**
+LanceDB (default)
+PGVector
+Astra DB
+Pinecone
+Chroma & ChromaCloud
+Weaviate
+Qdrant
+Milvus
+Zilliz
+Technical Overview
+This monorepo consists of six main sections:
+`frontend`: A viteJS + React frontend that you can run to easily create and manage all your content the LLM can use.
+`server`: A NodeJS express server to handle all the interactions and do all the vectorDB management and LLM interactions.
+`collector`: NodeJS express server that processes and parses documents from the UI.
+`docker`: Docker instructions and build process + information for building from source.
+`embed`: Submodule for generation & creation of the web embed widget.
+`browser-extension`: Submodule for the chrome browser extension.
+🛳 Self-Hosting
+Mintplex Labs & the community maintain a number of deployment methods, scripts, and templates that you can use to run AnythingLLM locally. Refer to the table below to read how to deploy on your preferred environment or to automatically deploy.
+| Docker | AWS | GCP | Digital Ocean | Render.com |
+|----------------------------------------|----|-----|---------------|------------|
+| [![Deploy on Docker][docker-btn]][docker-deploy] | [![Deploy on AWS][aws-btn]][aws-deploy] | [![Deploy on GCP][gcp-btn]][gcp-deploy] | [![Deploy on DigitalOcean][do-btn]][do-deploy] | [![Deploy on Render.com][render-btn]][render-deploy] |
+| Railway | RepoCloud | Elestio | Northflank |
+| --- | --- | --- | --- |
+| [![Deploy on Railway][railway-btn]][railway-deploy] | [![Deploy on RepoCloud][repocloud-btn]][repocloud-deploy] | [![Deploy on Elestio][elestio-btn]][elestio-deploy] | [![Deploy on Northflank][northflank-btn]][northflank-deploy] |
+or set up a production AnythingLLM instance without Docker →
+How to setup for development
+`yarn setup` To fill in the required `.env` files you'll need in each of the application sections (from root of repo).
+ - Go fill those out before proceeding. Ensure `server/.env.development` is filled or else things won't work right.
+`yarn dev:server` To boot the server locally (from root of repo).
+`yarn dev:frontend` To boot the frontend locally (from root of repo).
+`yarn dev:collector` To then run the document collector (from root of repo).
+Learn about documents
+Learn about vector caching
+External Apps & Integrations
+_These are apps that are not maintained by Mintplex Labs, but are compatible with AnythingLLM. A listing here is not an endorsement._
+Midori AI Subsystem Manager - A streamlined and efficient way to deploy AI systems using Docker container technology.
+Coolify - Deploy AnythingLLM with a single click.
+GPTLocalhost for Microsoft Word - A local Word Add-in for you to use AnythingLLM in Microsoft Word.
+Telemetry & Privacy
+AnythingLLM by Mintplex Labs Inc contains a telemetry feature that collects anonymous usage information.
+<details>
+<summary><kbd>More about Telemetry & Privacy for AnythingLLM</kbd></summary>
+Why?
+We use this information to help us understand how AnythingLLM is used, to help us prioritize work on new features and bug fixes, and to help us improve AnythingLLM's performance and stability.
+Opting out
+Set `DISABLE_TELEMETRY` in your server or docker .env settings to "true" to opt out of telemetry. You can also do this in-app by going to the sidebar > `Privacy` and disabling telemetry.
+What do you explicitly track?
+We will only track usage details that help us make product and roadmap decisions, specifically:
+Type of your installation (Docker or Desktop)
+When a document is added or removed. No information _about_ the document. Just that the event occurred. This gives us an idea of use.
+Type of vector database in use. This helps us prioritize changes when updates arrive for that provider.
+Type of LLM provider & model tag in use. This helps us prioritize changes when updates arrive for that provider or model, or combination thereof. eg: reasoning vs regular, multi-modal models, etc.
+When a chat is sent. This is the most regular "event" and gives us an idea of the daily-activity of this project across all installations. Again, only the **event** is sent - we have no information on the nature or content of the chat itself.
+You can verify these claims by finding all locations `Telemetry.sendTelemetry` is called. Additionally these events are written to the output log so you can also see the specific data which was sent - if enabled. **No IP or other identifying information is collected**. The Telemetry provider is PostHog - an open-source telemetry collection service.
+We take privacy very seriously, and we hope you understand that we want to learn how our tool is used, without using annoying popup surveys, so we can build something worth using. The anonymous data is _never_ shared with third parties, ever.
+View all telemetry events in source code
+</details>
+👋 Contributing
+Contributing to AnythingLLM - How to contribute to AnythingLLM.
+💖 Sponsors
+Premium Sponsors
+<!-- premium-sponsors (reserved for $100/mth sponsors who request to be called out here and/or are non-private sponsors) -->
+<a href=" target="_blank">
+ <img src=" height="100px" alt="User avatar: DCS DIGITAL" />
+</a>
+<!-- premium-sponsors -->
+All Sponsors
+<!-- all-sponsors --><a href=" src=" width="60px" alt="User avatar: Jascha" /></a><a href=" src=" width="60px" alt="User avatar: KickAss" /></a><a href=" src=" width="60px" alt="User avatar: ShadowArcanist" /></a><a href=" src=" width="60px" alt="User avatar: Atlas" /></a><a href=" src=" width="60px" alt="User avatar: Predrag Stojadinović" /></a><a href=" src=" width="60px" alt="User avatar: Diego Spinola" /></a><a href=" src=" width="60px" alt="User avatar: Kyle" /></a><a href=" src=" width="60px" alt="User avatar: Giulio De Pasquale" /></a><a href=" src=" width="60px" alt="User avatar: " /></a><a href=" src=" width="60px" alt="User avatar: MacStadium" /></a><a href=" src=" width="60px" alt="User avatar: " /></a><a href=" src=" width="60px" alt="User avatar: " /></a><a href=" src=" width="60px" alt="User avatar: " /></a><a href=" src=" width="60px" alt="User avatar: " /></a><a href=" src=" width="60px" alt="User avatar: Dennis" /></a><a href=" src=" width="60px" alt="User avatar: Michael Hamilton, Ph.D." /></a><a href=" src=" width="60px" alt="User avatar: " /></a><a href=" src=" width="60px" alt="User avatar: TernaryLabs" /></a><a href=" src=" width="60px" alt="User avatar: Daniel Cela" /></a><a href=" src=" width="60px" alt="User avatar: Alesso" /></a><a href=" src=" width="60px" alt="User avatar: Rune Mathisen" /></a><a href=" src=" width="60px" alt="User avatar: " /></a><a href=" src=" width="60px" alt="User avatar: " /></a><a href=" src=" width="60px" alt="User avatar: Alan" /></a><a href=" src=" width="60px" alt="User avatar: Damien Peters" /></a><a href=" src=" width="60px" alt="User avatar: DCS Digital" /></a><a href=" src=" width="60px" alt="User avatar: Paul Mcilreavy" /></a><a href=" src=" width="60px" alt="User avatar: Til Wolf" /></a><a href=" src=" width="60px" alt="User avatar: Leopoldo Crhistian Riverin Gomez" /></a><a href=" src=" width="60px" alt="User avatar: AJEsau" /></a><a href=" src=" width="60px" alt="User avatar: Steven VanOmmeren" /></a><a href=" src=" width="60px" alt="User avatar: Casey Boettcher" /></a><a href=" src=" width="60px" alt="User avatar: " /></a><a href=" src=" width="60px" alt="User avatar: Avineet" /></a><a href=" src=" width="60px" alt="User avatar: Chris" /></a><a href=" src=" width="60px" alt="User avatar: mirko" /></a><a href=" src=" width="60px" alt="User avatar: Tim Champ" /></a><a href=" src=" width="60px" alt="User avatar: Peter Mathisen" /></a><a href=" src=" width="60px" alt="User avatar: Ed di Girolamo" /></a><a href=" src=" width="60px" alt="User avatar: Wojciech Miłkowski" /></a><!-- all-sponsors -->
+🌟 Contributors
+[](
+[](
+🔗 More Products
+**[VectorAdmin][vector-admin]:** An all-in-one GUI & tool-suite for managing vector databases.
+**[OpenAI Assistant Swarm][assistant-swarm]:** Turn your entire library of OpenAI assistants into one single army commanded from a single agent.
+<div align="right">
+[
+</div>
+Copyright © 2025 [Mintplex Labs][profile-link]. <br />
+This project is MIT licensed.
+<!-- LINK GROUP -->
+[back-to-top]: 
+[profile-link]: 
+[vector-admin]: 
+[assistant-swarm]: 
+[docker-btn]: ./images/deployBtns/docker.png
+[docker-deploy]: ./docker/HOW_TO_USE_DOCKER.md
+[aws-btn]: ./images/deployBtns/aws.png
+[aws-deploy]: ./cloud-deployments/aws/cloudformation/DEPLOY.md
+[gcp-btn]: 
+[gcp-deploy]: ./cloud-deployments/gcp/deployment/DEPLOY.md
+[do-btn]: 
+[do-deploy]: ./cloud-deployments/digitalocean/terraform/DEPLOY.md
+[render-btn]: 
+[render-deploy]: 
+[render-btn]: 
+[render-deploy]: 
+[railway-btn]: 
+[railway-deploy]: 
+[repocloud-btn]: 
+[repocloud-deploy]: 
+[elestio-btn]: 
+[elestio-deploy]: 
+[northflank-btn]: 
+[northflank-deploy]:
+
+
+===== C:\Users\Breno\AppData\Local\Temp\repo_1u3zfsju\repo\SECURITY.md =====
+Security Policy
+Supported Versions
+Use this section to tell people about which versions of your project are
+currently being supported with security updates.
+| Version | Supported |
+| ------- | ------------------ |
+| 0.1.x | :white_check_mark: |
+Reporting a Vulnerability
+If a security concern is found that you would like to disclose you can create a PR for it or if you would like to clear this issue before posting you can email Core Mintplex Labs Team.
+
+
+===== C:\Users\Breno\AppData\Local\Temp\repo_1u3zfsju\repo\.devcontainer\README.md =====
+AnythingLLM Development Container Setup
+Welcome to the AnythingLLM development container configuration, designed to create a seamless and feature-rich development environment for this project.
+<center><h1><b>PLEASE READ THIS</b></h1></center>
+Prerequisites
+Docker
+Visual Studio Code
+Remote - Containers VS Code extension
+Features
+**Base Image**: Built on `mcr.microsoft.com/devcontainers/javascript-node:1-18-bookworm`, thus Node.JS LTS v18.
+**Additional Tools**: Includes `hadolint`, and essential apt-packages such as `curl`, `gnupg`, and more.
+**Ports**: Configured to auto-forward ports `3000` (Frontend) and `3001` (Backend).
+**Environment Variables**: Sets `NODE_ENV` to `development` and `ESLINT_USE_FLAT_CONFIG` to `true`.
+**VS Code Extensions**: A suite of extensions such as `Prettier`, `Docker`, `ESLint`, and more are automatically installed. Please revise if you do not agree with any of these extensions. AI-powered extensions and time trackers are (for now) not included to avoid any privacy concerns, but you can install them later in your own environment.
+Getting Started
+1. Using GitHub Codespaces. Just select to create a new workspace, and the devcontainer will be created for you.
+2. Using your Local VSCode (Release or Insiders). We suggest you first make a fork of the repo and then clone it to your local machine using VSCode tools. Then open the project folder in VSCode, which will prompt you to open the project in a devcontainer. Select yes, and the devcontainer will be created for you. If this does not happen, you can open the command palette and select "Remote-Containers: Reopen in Container".
+On Creation:
+When the container is built for the first time, it will automatically run `yarn setup` to ensure everything is in place for the Collector, Server and Frontend. This command is expected to be automatically re-run if there is a content change on next reboot.
+Work in the Container:
+Once the container is up, be patient. Some extensions may complain because dependencies are still being installed, and in the Extensions tab, some may ask you to "Reload" the project. Don't do that yet. First, wait until all settle down for the first time. We suggest you create a new VSCode profile for this devcontainer, so any configuration and extensions you change, won't affect your default profile.
+Checklist:
+[ ] The usual message asking you to start the Server and Frontend in different windows are now "hidden" in the building process of the devcontainer. Don't forget to do as suggested.
+[ ] Open a JavaScript file, for example "server/index.js" and check if `eslint` is working. It will complain that `'err' is defined but never used.`. This means it is working.
+[ ] Open a React File, for example, "frontend/src/main.jsx," and check if `eslint` complains about `Fast refresh only works when a file has exports. Move your component(s) to a separate file.`. Again, it means `eslint` is working. Now check at the status bar if the `Prettier` has a double checkmark :heavy_check_mark: (double). It means Prettier is working. You will see a nice extension `Formatting:`:heavy_check_mark: that can be used to disable the `Format on Save` feature temporarily.
+[ ] Check if, on the left pane, you have the NPM Scripts (this may be disabled; look at the "Explorer" tree-dots up-right). There will be scripts inside the `package.json` files. You will basically need to run the `dev:collector`, `dev:server` and the `dev:frontend` in this order. When the frontend finishes starting, a window browser will open **inside** the VSCode. Still, you can open it outside.
+:warning: **Important for all developers** :warning:
+[ ] When you are using the `NODE_ENV=development` the server will not store the configurations you set for security reasons. Please set the proper config on file `.env.development`. The side-effect if you don't, everytime you restart the server, you will be sent to the "Onboarding" page again.
+Note when using GitHub Codespaces**
+[ ] When running the "Server" for the first time, it will automatically configure its port to be publicly accessible by default, as this is required for the front end to reach the server backend. To know more, read the content of the `.env` file on the frontend folder about this, and if any issues occur, make sure to manually set the port "Visibility" of the "Server" is set to "Public" if needed. Again, this is only needed for developing on GitHub Codespaces.
+For the Collector:**
+[x] In the past, the Collector dwelled within the Python domain, but now it has journeyed to the splendid realm of Node.JS. Consequently, the configuration complexities of bygone versions are no longer a concern.
+Now it is ready to start
+In the status bar you will see three shortcuts names `Collector`, `Server` and `Frontend`. Just click-and-wait on that order (don't forget to set the Server port 3001 to Public if you are using GH Codespaces **_before_** starting the Frontend).
+Now you can enjoy your time developing instead of reconfiguring everything.
+Debugging with the devcontainers
+For debugging the collector, server and frontend
+First, make sure the built-in extension (ms-vscode.js-debug) is active (I don't know why it would not be, but just in case). If you want, you can install the nightly version (ms-vscode.js-debug-nightly)
+Then, in the "Run and Debug" tab (Ctrl+shift+D), you can select on the menu:
+Collector debug. This will start the collector in debug mode and attach the debugger. Works very well.
+Server debug. This will start the server in debug mode and attach the debugger. Works very well.
+Frontend debug. This will start the frontend in debug mode and attach the debugger. I am still struggling with this one. I don't know if VSCode can handle the .jsx files seamlessly as the pure .js on the server. Maybe there is a need for a particular configuration for Vite or React. Anyway, it starts. Another two configurations launch Chrome and Edge, and I think we could add breakpoints on .jsx files somehow. The best scenario would be always to use the embedded browser. WIP.
+Please leave comments on the Issues tab or the []("
+
+
+===== C:\Users\Breno\AppData\Local\Temp\repo_1u3zfsju\repo\cloud-deployments\aws\cloudformation\aws_https_instructions.md =====
+How to Configure HTTPS for Anything LLM AWS private deployment
+Instructions for manual configuration after generating and running the aws cloudformation template (aws_build_from_source_no_credentials.json). Tested on following browsers: Firefox version 119, Chrome version 118, Edge 118.
+Requirements**
+Successful deployment of Amazon Linux 2023 EC2 instance with Docker container running Anything LLM
+Admin priv to configure Elastic IP for EC2 instance via AWS Management Console UI
+Admin priv to configure DNS services (i.e. AWS Route 53) via AWS Management Console UI
+Admin priv to configure EC2 Security Group rules via AWS Management Console UI
+Step 1: Allocate and assign Elastic IP Address to your deployed EC2 instance
+1. Follow AWS instructions on allocating EIP here: 
+2. Follow AWS instructions on assigning EIP to EC2 instance here: 
+Step 2: Configure DNS A record to resolve to the previously assigned EC2 instance via EIP 
+These instructions assume that you already have a top-level domain configured and are using a subdomain 
+to access AnythingLLM.
+1. Follow AWS instructions on routing traffic to EC2 instance here: 
+Step 3: Install and enable nginx
+These instructions are for CLI configuration and assume you are logged in to EC2 instance as the ec2-user.
+1. $sudo yum install nginx -y
+2. $sudo systemctl enable nginx && sudo systemctl start nginx
+Step 4: Install certbot
+These instructions are for CLI configuration and assume you are logged in to EC2 instance as the ec2-user.
+1. $sudo yum install -y augeas-libs
+2. $sudo python3 -m venv /opt/certbot/
+3. $sudo /opt/certbot/bin/pip install --upgrade pip
+4. $sudo /opt/certbot/bin/pip install certbot certbot-nginx
+5. $sudo ln -s /opt/certbot/bin/certbot /usr/bin/certbot
+Step 5: Configure temporary Inbound Traffic Rule for Security Group to certbot DNS verification
+1. Follow AWS instructions on creating inbound rule (http port 80 0.0.0.0/0) for EC2 security group here: 
+Step 6: Comment out default http NGINX proxy configuration
+These instructions are for CLI configuration and assume you are logged in to EC2 instance as the ec2-user.
+1. $sudo vi /etc/nginx/nginx.conf
+2. In the nginx.conf file, comment out the default server block configuration for 80. It should look something like the following:
+3. Enter ':wq' to save the changes to the nginx default config
+Step 7: Create simple http proxy configuration for AnythingLLM 
+These instructions are for CLI configuration and assume you are logged in to EC2 instance as the ec2-user.
+1. $sudo vi /etc/nginx/conf.d/anything.conf
+2. Add the following configuration ensuring that you add your FQDN:.
+3. Enter ':wq' to save the changes to the anything config file
+Step 8: Test nginx http proxy config and restart nginx service
+These instructions are for CLI configuration and assume you are logged in to EC2 instance as the ec2-user.
+1. $sudo nginx -t
+2. $sudo systemctl restart nginx
+3. Navigate to in a browser and you should be proxied to the AnythingLLM web UI.
+Step 9: Generate/install cert
+These instructions are for CLI configuration and assume you are logged in to EC2 instance as the ec2-user.
+1. $sudo certbot --nginx -d [Insert FQDN here] 
+ Example command: $sudo certbot --nginx -d anythingllm.exampleorganization.org
+ This command will generate the appropriate certificate files, write the files to /etc/letsencrypt/live/yourFQDN, and make updates to the nginx
+ configuration file for anythingllm located at /etc/nginx/conf.d/anything.llm
+3. Enter the email address you would like to use for updates.
+4. Accept the terms of service.
+5. Accept or decline to receive communication from LetsEncrypt.
+Step 10: Test Cert installation
+1. $sudo cat /etc/nginx/conf.d/anything.conf
+Your should see a completely updated configuration that includes and a redirect configuration for 
+2. Navigate to in a browser and you should be proxied to the AnythingLLM web UI.
+Step 11: (Optional) Remove temporary Inbound Traffic Rule for Security Group to certbot DNS verification
+1. Follow AWS instructions on deleting inbound rule (http port 80 0.0.0.0/0) for EC2 security group here:
+
+
+===== C:\Users\Breno\AppData\Local\Temp\repo_1u3zfsju\repo\cloud-deployments\aws\cloudformation\DEPLOY.md =====
+How to deploy a private AnythingLLM instance on AWS
+With an AWS account you can easily deploy a private AnythingLLM instance on AWS. This will create a url that you can access from any browser over HTTP (HTTPS not supported). This single instance will run on your own keys and they will not be exposed - however if you want your instance to be protected it is highly recommend that you set a password once setup is complete.
+Quick Launch (EASY)**
+1. Log in to your AWS account
+2. Open CloudFormation
+3. Ensure you are deploying in a geographic zone that is nearest to your physical location to reduce latency.
+4. Click `Create Stack`
+5. Use the file `cloudformation_create_anythingllm.json` as your JSON template.
+6. Click Deploy. 
+7. Wait for stack events to finish and be marked as `Completed`
+8. View `Outputs` tab.
+9. Wait for all resources to be built. Now wait until instance is available on `[InstanceIP]:3001`.
+This process may take up to 10 minutes. See **Note** below on how to visualize this process.
+The output of this cloudformation stack will be:
+1 EC2 Instance
+1 Security Group with 0.0.0.0/0 access on port 3001
+1 EC2 Instance Volume `gb2` of 10Gib minimum - customizable pre-deploy.
+Requirements**
+An AWS account with billing information.
+Please read this notice before submitting issues about your deployment
+Note:** 
+Your instance will not be available instantly. Depending on the instance size you launched with it can take 5-10 minutes to fully boot up.
+If you want to check the instance's progress, navigate to your deployed EC2 instances and connect to your instance via SSH in browser.
+Once connected run `sudo tail -f /var/log/cloud-init-output.log` and wait for the file to conclude deployment of the docker image.
+You should see an output like this
+Additionally, your use of this deployment process means you are responsible for any costs of these AWS resources fully.
+
+
+===== C:\Users\Breno\AppData\Local\Temp\repo_1u3zfsju\repo\cloud-deployments\digitalocean\terraform\DEPLOY.md =====
+How to deploy a private AnythingLLM instance on DigitalOcean using Terraform
+With a DigitalOcean account, you can easily deploy a private AnythingLLM instance using Terraform. This will create a URL that you can access from any browser over HTTP (HTTPS not supported). This single instance will run on your own keys, and they will not be exposed. However, if you want your instance to be protected, it is highly recommended that you set a password once setup is complete.
+The output of this Terraform configuration will be:
+1 DigitalOcean Droplet
+An IP address to access your application
+Requirements**
+An DigitalOcean account with billing information
+Terraform installed on your local machine
+ - Follow the instructions in the official Terraform documentation for your operating system.
+How to deploy on DigitalOcean
+Open your terminal and navigate to the `docker` folder
+1. Create a `.env` file by cloning the `.env.example`. 
+2. Navigate to `digitalocean/terraform` folder.
+3. Replace the token value in the provider "digitalocean" block in main.tf with your DigitalOcean API token.
+4. Run the following commands to initialize Terraform, review the infrastructure changes, and apply them:
+Confirm the changes by typing yes when prompted.
+5. Once the deployment is complete, Terraform will output the public IP address of your droplet. You can access your application using this IP address.
+How to deploy on DigitalOcean
+To delete the resources created by Terraform, run the following command in the terminal:
+`
+terraform destroy 
+`
+Please read this notice before submitting issues about your deployment
+Note:** 
+Your instance will not be available instantly. Depending on the instance size you launched with it can take anywhere from 5-10 minutes to fully boot up.
+If you want to check the instances progress, navigate to your deployed instances and connect to your instance via SSH in browser.
+Once connected run `sudo tail -f /var/log/cloud-init-output.log` and wait for the file to conclude deployment of the docker image.
+Additionally, your use of this deployment process means you are responsible for any costs of these Digital Ocean resources fully.
+
+
+===== C:\Users\Breno\AppData\Local\Temp\repo_1u3zfsju\repo\cloud-deployments\gcp\deployment\DEPLOY.md =====
+How to deploy a private AnythingLLM instance on GCP
+With a GCP account you can easily deploy a private AnythingLLM instance on GCP. This will create a url that you can access from any browser over HTTP (HTTPS not supported). This single instance will run on your own keys and they will not be exposed - however if you want your instance to be protected it is highly recommend that you set a password once setup is complete.
+The output of this cloudformation stack will be:
+1 GCP VM
+1 Security Group with 0.0.0.0/0 access on Ports 22 & 3001
+1 GCP VM Volume `gb2` of 10Gib minimum
+Requirements**
+An GCP account with billing information.
+How to deploy on GCP
+Open your terminal
+1. Log in to your GCP account using the following command:
+2. After successful login, Run the following command to create a deployment using the Deployment Manager CLI:
+Once you execute these steps, the CLI will initiate the deployment process on GCP based on your configuration file. You can monitor the deployment status and view the outputs using the Google Cloud Console or the Deployment Manager CLI commands.
+ssh into the instance
+Delete the deployment
+Please read this notice before submitting issues about your deployment
+Note:** 
+Your instance will not be available instantly. Depending on the instance size you launched with it can take anywhere from 5-10 minutes to fully boot up.
+If you want to check the instances progress, navigate to your deployed instances and connect to your instance via SSH in browser.
+Once connected run `sudo tail -f /var/log/cloud-init-output.log` and wait for the file to conclude deployment of the docker image.
+Additionally, your use of this deployment process means you are responsible for any costs of these GCP resources fully.
+
+
+===== C:\Users\Breno\AppData\Local\Temp\repo_1u3zfsju\repo\cloud-deployments\helm\charts\anythingllm\README.md =====
+anythingllm
+AnythingLLM
+The all-in-one Desktop & Docker AI application with built-in RAG, AI agents, No-code agent builder, MCP compatibility, and more.
+Configuration & Usage**
+**Config vs Secrets:** This chart exposes application configuration via two mechanisms:
+ - `config` (in `values.yaml`) — rendered into a `ConfigMap` and injected using `envFrom` in the pod. Do NOT place sensitive values (API keys, secrets) in `config` because `ConfigMap`s are not encrypted.
+ - `env` / `envFrom` — the preferred way to inject secrets. Use Kubernetes `Secret` objects and reference them from `env` (with `valueFrom.secretKeyRef`) or `envFrom.secretRef`.
+**Storage & STORAGE_DIR mapping:** The chart creates (or mounts) a `PersistentVolumeClaim` using the `persistentVolume.*` settings. The container mount path is set from `persistentVolume.mountPath`. Ensure the container `STORAGE_DIR` config key matches that path (defaults are set in `values.yaml`).
+Providing API keys & secrets (recommended)**
+Use Kubernetes Secrets. Below are example workflows and `values.yaml` snippets.
+1) Create a Kubernetes Secret with API keys:
+2) Reference the Secret from `values.yaml` using `envFrom` (recommended when your secret contains multiple env keys):
+This will inject all key/value pairs from the `openai-secret` Secret as environment variables in the container.
+3) Or reference a single secret key via `env` (explicit mapping):
+Notes:
+Avoid placing secret values into `config:` (the chart's `ConfigMap`) — `ConfigMap`s are visible to anyone who can read the namespace. Use `Secret` objects for any credentials/tokens.
+If you use a GitOps workflow, consider integrating an external secret operator (ExternalSecrets, SealedSecrets, etc.) so you don't store raw secrets in Git.
+Example `values-secret.yaml` to pass during `helm install`**
+Install with:
+Best practices & tips**
+Use `envFrom` for convenience when many environment variables are stored in a single `Secret` and use `env`/`valueFrom` for explicit single-key mappings.
+Use `kubectl create secret generic` or your secrets management solution. If you need to reference multiple different provider keys (OpenAI, Anthropic, etc.), create a single `Secret` with multiple keys or multiple Secrets and add multiple `envFrom` entries.
+Keep probe paths and `service.port` aligned. If your probes fail after deployment, check that the probe `port` matches the container port (or named port ` and that the `path` is valid.
+For storage, if you have a pre-existing PVC set `persistentVolume.existingClaim` to the PVC name; the chart will mount that claim (and will not attempt to create a new PVC).
+For production, provide resource `requests` and `limits` in `values.yaml` to prevent scheduler starvation and to control cost.
+Values
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| affinity | object | `{}` | |
+| config.DISABLE_TELEMETRY | string | `"true"` | |
+| config.GID | string | `"1000"` | |
+| config.NODE_ENV | string | `"production"` | |
+| config.STORAGE_DIR | string | `"/storage"` | |
+| config.UID | string | `"1000"` | |
+| env | object | `{}` | |
+| envFrom | object | `{}` | |
+| fullnameOverride | string | `""` | |
+| image.pullPolicy | string | `"IfNotPresent"` | |
+| image.repository | string | `"mintplexlabs/anythingllm"` | |
+| image.tag | string | `"1.9.0"` | |
+| imagePullSecrets | list | `[]` | |
+| ingress.annotations | object | `{}` | |
+| ingress.className | string | `""` | |
+| ingress.enabled | bool | `false` | |
+| ingress.hosts[0].host | string | `"chart-example.local"` | |
+| ingress.hosts[0].paths[0].path | string | `"/"` | |
+| ingress.hosts[0].paths[0].pathType | string | `"ImplementationSpecific"` | |
+| ingress.tls | list | `[]` | |
+| initContainers | list | `[]` | |
+| livenessProbe.failureThreshold | int | `3` | |
+| livenessProbe. | string | `"/v1/api/health"` | |
+| livenessProbe. | int | `8888` | |
+| livenessProbe.initialDelaySeconds | int | `15` | |
+| livenessProbe.periodSeconds | int | `5` | |
+| nameOverride | string | `""` | |
+| nodeSelector | object | `{}` | |
+| persistentVolume.accessModes[0] | string | `"ReadWriteOnce"` | |
+| persistentVolume.annotations | object | `{}` | |
+| persistentVolume.existingClaim | string | `""` | |
+| persistentVolume.labels | object | `{}` | |
+| persistentVolume.mountPath | string | `"/storage"` | |
+| persistentVolume.size | string | `"8Gi"` | |
+| podAnnotations | object | `{}` | |
+| podLabels | object | `{}` | |
+| podSecurityContext.fsGroup | int | `1000` | |
+| readinessProbe. | string | `"/v1/api/health"` | |
+| readinessProbe. | int | `8888` | |
+| readinessProbe.initialDelaySeconds | int | `15` | |
+| readinessProbe.periodSeconds | int | `5` | |
+| readinessProbe.successThreshold | int | `2` | |
+| replicaCount | int | `1` | |
+| resources | object | `{}` | |
+| securityContext | object | `{}` | |
+| service.port | int | `3001` | |
+| service.type | string | `"ClusterIP"` | |
+| serviceAccount.annotations | object | `{}` | |
+| serviceAccount.automount | bool | `true` | |
+| serviceAccount.create | bool | `true` | |
+| serviceAccount.name | string | `""` | |
+| tolerations | list | `[]` | |
+| volumeMounts | list | `[]` | |
+| volumes | list | `[]` | |
+
+
+===== C:\Users\Breno\AppData\Local\Temp\repo_1u3zfsju\repo\collector\hotdir\__HOTDIR__.md =====
+What is the "Hot directory"
+This is a pre-set file location that documents will be written to when uploaded by AnythingLLM. There is really no need to touch it.
+
+
+===== C:\Users\Breno\AppData\Local\Temp\repo_1u3zfsju\repo\docker\HOW_TO_USE_DOCKER.md =====
+How to use Dockerized Anything LLM
+Use the Dockerized version of AnythingLLM for a much faster and complete startup of AnythingLLM.
+Minimum Requirements
+[!TIP]
+Running AnythingLLM on AWS/GCP/Azure?
+You should aim for at least 2GB of RAM. Disk storage is proportional to however much data
+you will be storing (documents, vectors, models, etc). Minimum 10GB recommended.
+`docker` installed on your machine
+`yarn` and `node` on your machine
+access to an LLM running locally or remotely
+\*AnythingLLM by default uses a built-in vector database powered by LanceDB
+\*AnythingLLM by default embeds text on instance privately Learn More
+Recommend way to run dockerized AnythingLLM!
+[!IMPORTANT]
+If you are running another service on localhost like Chroma, LocalAi, or LMStudio
+you will need to use to access the service from within
+the docker container using AnythingLLM as `localhost:xxxx` will not resolve for the host system.
+> **Requires** Docker v18.03+ on Win/Mac and 20.10+ on Linux/Ubuntu for host.docker.internal to resolve!
+> _Linux_: add `--add-host=host.docker.internal:host-gateway` to docker run command for this to resolve.
+> eg: Chroma host URL running on localhost:8000 on host machine needs to be 
+when used in AnythingLLM.
+[!TIP]
+It is best to mount the containers storage volume to a folder on your host machine
+so that you can pull in future updates without deleting your existing data!
+Pull in the latest image from docker. Supports both `amd64` and `arm64` CPU architectures.
+<table>
+<tr>
+<th colspan="2">Mount the storage locally and run AnythingLLM in Docker</th>
+</tr>
+<tr>
+<td>
+ Linux/MacOs
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+ Windows
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td> Docker Compose</td>
+<td>
+ </td>
+</tr>
+</table>
+Go to ` and you are now using AnythingLLM! All your data and progress will persist between
+container rebuilds or pulls from Docker Hub.
+How to use the user interface
+To access the full application, visit ` in your browser.
+About UID and GID in the ENV
+The UID and GID are set to 1000 by default. This is the default user in the Docker container and on most host operating systems. If there is a mismatch between your host user UID and GID and what is set in the `.env` file, you may experience permission issues.
+Build locally from source _not recommended for casual use_
+`git clone` this repo and `cd anything-llm` to get to the root directory.
+`touch server/storage/anythingllm.db` to create empty SQLite DB file.
+`cd docker/`
+`cp .env.example .env` **you must do this before building**
+`docker-compose up -d --build` to build the image - this will take a few moments.
+Your docker host will show the image as online once the build process is completed. This will build the app to `
+Integrations and one-click setups
+The integrations below are templates or tooling built by the community to make running the docker experience of AnythingLLM easier.
+Use the Midori AI Subsystem to Manage AnythingLLM
+Follow the setup found on Midori AI Subsystem Site for your host OS
+After setting that up install the AnythingLLM docker backend to the Midori AI Subsystem.
+Once that is done, you are all set!
+Common questions and fixes
+Cannot connect to service running on localhost!
+If you are in docker and cannot connect to a service running on your host machine running on a local interface or loopback:
+`localhost`
+`127.0.0.1`
+`0.0.0.0`
+[!IMPORTANT]
+On linux ` does not work.
+Use ` instead to emulate this functionality.
+Then in docker you need to replace that localhost part with `host.docker.internal`. For example, if running Ollama on the host machine, bound to you should put ` into the connection URL in AnythingLLM.
+API is not working, cannot login, LLM is "offline"?
+You are likely running the docker container on a remote machine like EC2 or some other instance where the reachable URL
+is not ` and instead is something like ` - in this case all you need to do is add the following to your `frontend/.env.production` before running `docker-compose up -d --build`
+For example, if the docker instance is available on `192.186.1.222` your `VITE_API_BASE` would look like `VITE_API_BASE=" in `frontend/.env.production`.
+Having issues with Ollama?
+If you are getting errors like `llama:streaming - could not stream chat. Error: connect ECONNREFUSED 172.17.0.1:11434` then visit the README below.
+Fix common issues with Ollama
+Still not working?
+Ask for help on Discord
+
+
+===== C:\Users\Breno\AppData\Local\Temp\repo_1u3zfsju\repo\locales\README.fa-IR.md =====
+<a name="readme-top"></a>
+<p align="center">
+ <a href=" src=" alt="AnythingLLM logo"></a>
+</p>
+<div align='center'>
+<a href=" target="_blank"><img src=" alt="Mintplex-Labs%2Fanything-llm | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+</div>
+<p align="center" dir="rtl">
+ <b>AnythingLLM:</b> اپلیکیشن همه‌کاره هوش مصنوعی که دنبالش بودید.<br />
+ با اسناد خود چت کنید، از عامل‌های هوش مصنوعی استفاده کنید، با قابلیت پیکربندی بالا، چند کاربره، و بدون نیاز به تنظیمات پیچیده.
+</p>
+<p align="center">
+ <a href=" target="_blank">
+ <img src=" alt="Discord">
+ </a> |
+ <a href=" target="_blank">
+ <img src=" alt="License">
+ </a> |
+ <a href=" target="_blank">
+ Docs
+ </a> |
+ <a href=" target="_blank">
+ Hosted Instance
+ </a>
+</p>
+<p align="center" dir="rtl">
+ <b>English</b> · <a href='./locales/README.zh-CN.md'>简体中文</a> · <a href='./locales/README.ja-JP.md'>日本語</a> · <b>فارسی</b>
+</p>
+<p align="center" dir="rtl">
+👈 AnythingLLM برای دسکتاپ (مک، ویندوز و لینوکس)! <a href=" target="_blank">دانلود کنید</a>
+</p>
+<div dir="rtl">
+یک اپلیکیشن کامل که به شما امکان می‌دهد هر سند، منبع یا محتوایی را به زمینه‌ای تبدیل کنید که هر LLM می‌تواند در حین گفتگو به عنوان مرجع از آن استفاده کند. این برنامه به شما اجازه می‌دهد LLM یا پایگاه داده برداری مورد نظر خود را انتخاب کنید و همچنین از مدیریت چند کاربره و مجوزها پشتیبانی می‌کند.
+</div>
+<details>
+<summary><kbd>دموی ویدیویی را تماشا کنید!</kbd></summary>
+[](
+</details>
+<div dir="rtl">
+نمای کلی محصول
+AnythingLLM یک اپلیکیشن کامل است که در آن می‌توانید از LLM‌های تجاری آماده یا LLM‌های متن‌باز محبوب و راه‌حل‌های vectorDB برای ساخت یک ChatGPT خصوصی بدون محدودیت استفاده کنید که می‌توانید آن را به صورت محلی اجرا کنید یا از راه دور میزبانی کنید و با هر سندی که به آن ارائه می‌دهید، هوشمندانه گفتگو کنید.
+AnythingLLM اسناد شما را به اشیایی به نام `workspaces` تقسیم می‌کند. یک Workspace مانند یک رشته عمل می‌کند، اما با اضافه شدن کانتینرسازی اسناد شما. Workspaceها می‌توانند اسناد را به اشتراک بگذارند، اما با یکدیگر ارتباط برقرار نمی‌کنند تا بتوانید زمینه هر workspace را تمیز نگه دارید.
+</div>
+<div dir="rtl">
+ویژگی‌های جذاب AnythingLLM
+🆕 **عامل‌های هوش مصنوعی سفارشی**
+🖼️ **پشتیبانی از چند مدل (هم LLMهای متن‌باز و هم تجاری!)**
+👤 پشتیبانی از چند کاربر و سیستم مجوزها _فقط در نسخه Docker_
+🦾 عامل‌ها در فضای کاری شما (مرور وب، اجرای کد و غیره)
+💬 ویجت چت قابل جاسازی سفارشی برای وب‌سایت شما _فقط در نسخه Docker_
+📖 پشتیبانی از انواع مختلف سند (PDF، TXT، DOCX و غیره)
+رابط کاربری ساده چت با قابلیت کشیدن و رها کردن و استنادهای واضح
+۱۰۰٪ آماده استقرار در فضای ابری
+سازگار با تمام ارائه‌دهندگان محبوب LLM متن‌باز و تجاری
+دارای اقدامات داخلی صرفه‌جویی در هزینه و زمان برای مدیریت اسناد بسیار بزرگ در مقایسه با سایر رابط‌های کاربری چت
+API کامل توسعه‌دهنده برای یکپارچه‌سازی‌های سفارشی!
+و موارد بیشتر... نصب کنید و کشف کنید!
+LLMها، مدل‌های Embedder، مدل‌های گفتاری و پایگاه‌های داده برداری پشتیبانی شده
+مدل‌های زبانی بزرگ (LLMs):**
+Any open-source llama.cpp compatible model
+OpenAI
+OpenAI (Generic)
+Azure OpenAI
+AWS Bedrock
+Anthropic
+NVIDIA NIM (chat models)
+Google Gemini Pro
+Hugging Face (chat models)
+Ollama (chat models)
+LM Studio (all models)
+LocalAi (all models)
+Together AI (chat models)
+Fireworks AI (chat models)
+Perplexity (chat models)
+OpenRouter (chat models)
+DeepSeek (chat models)
+Mistral
+Groq
+Cohere
+KoboldCPP
+LiteLLM
+Text Generation Web UI
+Apipie
+xAI
+Novita AI (chat models)
+PPIO
+<div dir="rtl">
+مدل‌های Embedder:**
+AnythingLLM Native Embedder (پیش‌فرض)
+OpenAI
+Azure OpenAI
+LocalAi (همه)
+Ollama (همه)
+LM Studio (همه)
+Cohere
+مدل‌های رونویسی صوتی:**
+AnythingLLM Built-in (پیش‌فرض)
+OpenAI
+پشتیبانی TTS (تبدیل متن به گفتار):**
+امکانات داخلی مرورگر (پیش‌فرض)
+PiperTTSLocal - اجرا در مرورگر
+OpenAI TTS
+ElevenLabs
+هر سرویس TTS سازگار با OpenAI
+پشتیبانی STT (تبدیل گفتار به متن):**
+امکانات داخلی مرورگر (پیش‌فرض)
+پایگاه‌های داده برداری:**
+LanceDB (پیش‌فرض)
+PGVector
+Astra DB
+Pinecone
+Chroma
+Weaviate
+Qdrant
+Milvus
+Zilliz
+نمای کلی فنی
+این مخزن شامل سه بخش اصلی است:
+`frontend`: یک رابط کاربری viteJS + React که می‌توانید برای ایجاد و مدیریت آسان تمام محتوای قابل استفاده توسط LLM اجرا کنید.
+`server`: یک سرور NodeJS express برای مدیریت تمام تعاملات و انجام مدیریت vectorDB و تعاملات LLM.
+`collector`: سرور NodeJS express که اسناد را از رابط کاربری پردازش و تجزیه می‌کند.
+`docker`: دستورالعمل‌های Docker و فرآیند ساخت + اطلاعات برای ساخت از منبع.
+`embed`: زیرماژول برای تولید و ایجاد ویجت قابل جاسازی وب.
+`browser-extension`: زیرماژول برای افزونه مرورگر کروم.
+</div>
+🛳 میزبانی شخصی
+<div dir="rtl">
+Mintplex Labs و جامعه کاربران، روش‌ها، اسکریپت‌ها و قالب‌های متعددی را برای اجرای AnythingLLM به صورت محلی نگهداری می‌کنند. برای مطالعه نحوه استقرار در محیط مورد نظر خود یا استقرار خودکار، به جدول زیر مراجعه کنید.
+</div>
+| Docker | AWS | GCP | Digital Ocean | Render.com |
+|----------------------------------------|----|-----|---------------|------------|
+| [![Deploy on Docker][docker-btn]][docker-deploy] | [![Deploy on AWS][aws-btn]][aws-deploy] | [![Deploy on GCP][gcp-btn]][gcp-deploy] | [![Deploy on DigitalOcean][do-btn]][do-deploy] | [![Deploy on Render.com][render-btn]][render-deploy] |
+| Railway | RepoCloud | Elestio |
+| --- | --- | --- |
+| [![Deploy on Railway][railway-btn]][railway-deploy] | [![Deploy on RepoCloud][repocloud-btn]][repocloud-deploy] | [![Deploy on Elestio][elestio-btn]][elestio-deploy] |
+<div dir="rtl">
+یا راه‌اندازی نمونه تولیدی AnythingLLM بدون Docker →
+راه‌اندازی برای توسعه
+`yarn setup` برای پر کردن فایل‌های `.env` مورد نیاز در هر بخش از برنامه (از ریشه مخزن).
+ - قبل از ادامه، آن‌ها را پر کنید. اطمینان حاصل کنید که `server/.env.development` پر شده است، در غیر این صورت همه چیز درست کار نخواهد کرد.
+`yarn dev:server` برای راه‌اندازی سرور به صورت محلی (از ریشه مخزن).
+`yarn dev:frontend` برای راه‌اندازی فرانت‌اند به صورت محلی (از ریشه مخزن).
+`yarn dev:collector` برای اجرای جمع‌کننده اسناد (از ریشه مخزن).
+درباره اسناد بیشتر بدانید
+درباره کش‌کردن بردار بیشتر بدانید
+تله‌متری و حریم خصوصی
+AnythingLLM توسط Mintplex Labs Inc دارای ویژگی تله‌متری است که اطلاعات استفاده ناشناس را جمع‌آوری می‌کند.
+<details>
+<summary><kbd>اطلاعات بیشتر درباره تله‌متری و حریم خصوصی AnythingLLM</kbd></summary>
+چرا؟
+<div dir="rtl">
+ما از این اطلاعات برای درک نحوه استفاده از AnythingLLM، اولویت‌بندی کار روی ویژگی‌های جدید و رفع اشکالات، و بهبود عملکرد و پایداری AnythingLLM استفاده می‌کنیم.
+</div>
+غیرفعال کردن
+<div dir="rtl">
+برای غیرفعال کردن تله‌متری، `DISABLE_TELEMETRY` را در تنظیمات .env سرور یا داکر خود روی "true" تنظیم کنید. همچنین می‌توانید این کار را در برنامه با رفتن به نوار کناری > `حریم خصوصی` و غیرفعال کردن تله‌متری انجام دهید.
+</div>
+دقیقاً چه چیزی را ردیابی می‌کنید؟
+<div dir="rtl">
+ما فقط جزئیات استفاده‌ای را که به ما در تصمیم‌گیری‌های محصول و نقشه راه کمک می‌کند، ردیابی می‌کنیم، به طور خاص:
+نوع نصب شما (Docker یا Desktop)
+زمانی که سندی اضافه یا حذف می‌شود. هیچ اطلاعاتی _درباره_ سند نداریم. فقط رویداد ثبت می‌شود.
+نوع پایگاه داده برداری در حال استفاده. به ما کمک می‌کند بدانیم کدام ارائه‌دهنده بیشتر استفاده می‌شود.
+نوع LLM در حال استفاده. به ما کمک می‌کند محبوب‌ترین انتخاب را بشناسیم.
+ارسال چت. این معمول‌ترین "رویداد" است و به ما ایده‌ای از فعالیت روزانه می‌دهد.
+می‌توانید این ادعاها را با پیدا کردن تمام مکان‌هایی که `Telemetry.sendTelemetry` فراخوانی می‌شود، تأیید کنید. ارائه‌دهنده تله‌متری PostHog است.
+مشاهده همه رویدادهای تله‌متری در کد منبع
+</div>
+</details>
+👋 مشارکت
+<div dir="rtl">
+ایجاد issue
+ایجاد PR با فرمت نام شاخه `<شماره issue>-<نام کوتاه>`
+تأیید از تیم اصلی
+</div>
+🌟 مشارکت‌کنندگان
+[](
+[](
+🔗 محصولات بیشتر
+<div dir="rtl">
+**[VectorAdmin][vector-admin]:** یک رابط کاربری و مجموعه ابزار همه‌کاره برای مدیریت پایگاه‌های داده برداری.
+**[OpenAI Assistant Swarm][assistant-swarm]:** تبدیل کل کتابخانه دستیاران OpenAI به یک ارتش واحد تحت فرمان یک عامل.
+</div>
+<div align="right">
+[
+</div>
+<div dir="ltr" align="left">
+Copyright © 2025 [Mintplex Labs][profile-link]. <br />
+This project is MIT licensed.
+</div>
+<!-- LINK GROUP -->
+[back-to-top]: 
+[profile-link]: 
+[vector-admin]: 
+[assistant-swarm]: 
+[docker-btn]: ./images/deployBtns/docker.png
+[docker-deploy]: ./docker/HOW_TO_USE_DOCKER.md
+[aws-btn]: ./images/deployBtns/aws.png
+[aws-deploy]: ./cloud-deployments/aws/cloudformation/DEPLOY.md
+[gcp-btn]: 
+[gcp-deploy]: ./cloud-deployments/gcp/deployment/DEPLOY.md
+[do-btn]: 
+[do-deploy]: ./cloud-deployments/digitalocean/terraform/DEPLOY.md
+[render-btn]: 
+[render-deploy]: 
+[render-btn]: 
+[render-deploy]: 
+[railway-btn]: 
+[railway-deploy]: 
+[repocloud-btn]: 
+[repocloud-deploy]: 
+[elestio-btn]: 
+[elestio-deploy]:
+
+
+===== C:\Users\Breno\AppData\Local\Temp\repo_1u3zfsju\repo\locales\README.ja-JP.md =====
+<a name="readme-top"></a>
+<p align="center">
+ <a href=" src=" alt="AnythingLLM logo"></a>
+</p>
+<div align='center'>
+<a href=" target="_blank"><img src=" alt="Mintplex-Labs%2Fanything-llm | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+</div>
+<p align="center">
+ <b>AnythingLLM:</b> あなたが探していたオールインワンAIアプリ。<br />
+ ドキュメントとチャットし、AIエージェントを使用し、高度にカスタマイズ可能で、複数ユーザー対応、面倒な設定は不要です。
+</p>
+<p align="center">
+ <a href=" target="_blank">
+ <img src=" alt="Discord">
+ </a> |
+ <a href=" target="_blank">
+ <img src=" alt="ライセンス">
+ </a> |
+ <a href=" target="_blank">
+ ドキュメント
+ </a> |
+ <a href=" target="_blank">
+ ホストされたインスタンス
+ </a>
+</p>
+<p align="center">
+ <a href='../README.md'>English</a> · <a href='./README.zh-CN.md'>简体中文</a> · <b>日本語</b>
+</p>
+<p align="center">
+👉 デスクトップ用AnythingLLM(Mac、Windows、Linux対応)!<a href=" target="_blank">今すぐダウンロード</a>
+</p>
+これは、任意のドキュメント、リソース、またはコンテンツの断片を、チャット中にLLMが参照として使用できるコンテキストに変換できるフルスタックアプリケーションです。このアプリケーションを使用すると、使用するLLMまたはベクトルデータベースを選択し、マルチユーザー管理と権限をサポートできます。
+<details>
+<summary><kbd>デモを見る!</kbd></summary>
+[](
+</details>
+製品概要
+AnythingLLMは、市販のLLMや人気のあるオープンソースLLM、およびベクトルDBソリューションを使用して、妥協のないプライベートChatGPTを構築できるフルスタックアプリケーションです。ローカルで実行することも、リモートでホストすることもでき、提供されたドキュメントと知的にチャットできます。
+AnythingLLMは、ドキュメントを`ワークスペース`と呼ばれるオブジェクトに分割します。ワークスペースはスレッドのように機能しますが、ドキュメントのコンテナ化が追加されています。ワークスペースはドキュメントを共有できますが、互いに通信することはないため、各ワークスペースのコンテキストをクリーンに保つことができます。
+AnythingLLMのいくつかのクールな機能
+**マルチユーザーインスタンスのサポートと権限付与**
+ワークスペース内のエージェント(ウェブを閲覧、コードを実行など)
+ウェブサイト用のカスタム埋め込み可能なチャットウィジェット
+複数のドキュメントタイプのサポート(PDF、TXT、DOCXなど)
+シンプルなUIからベクトルデータベース内のドキュメントを管理
+2つのチャットモード`会話`と`クエリ`。会話は以前の質問と修正を保持します。クエリはドキュメントに対するシンプルなQAです
+チャット中の引用
+100%クラウドデプロイメント対応。
+「独自のLLMを持参」モデル。
+大規模なドキュメントを管理するための非常に効率的なコスト削減策。巨大なドキュメントやトランスクリプトを埋め込むために一度以上支払うことはありません。他のドキュメントチャットボットソリューションよりも90%コスト効率が良いです。
+カスタム統合のための完全な開発者API!
+サポートされているLLM、埋め込みモデル、音声モデル、およびベクトルデータベース
+言語学習モデル:**
+llama.cpp互換の任意のオープンソースモデル
+OpenAI
+OpenAI (汎用)
+Azure OpenAI
+Anthropic
+Google Gemini Pro
+Hugging Face (チャットモデル)
+Ollama (チャットモデル)
+LM Studio (すべてのモデル)
+LocalAi (すべてのモデル)
+Together AI (チャットモデル)
+Fireworks AI (チャットモデル)
+Perplexity (チャットモデル)
+OpenRouter (チャットモデル)
+Novita AI (チャットモデル)
+Mistral
+Groq
+Cohere
+KoboldCPP
+PPIO
+CometAPI (チャットモデル)
+埋め込みモデル:**
+AnythingLLMネイティブ埋め込み(デフォルト)
+OpenAI
+Azure OpenAI
+LocalAi (すべて)
+Ollama (すべて)
+LM Studio (すべて)
+Cohere
+音声変換モデル:**
+AnythingLLM内蔵(デフォルト)
+OpenAI
+TTS(テキストから音声へ)サポート:**
+ネイティブブラウザ内蔵(デフォルト)
+OpenAI TTS
+ElevenLabs
+STT(音声からテキストへ)サポート:**
+ネイティブブラウザ内蔵(デフォルト)
+ベクトルデータベース:**
+LanceDB(デフォルト)
+PGVector
+Astra DB
+Pinecone
+Chroma
+Weaviate
+QDrant
+Milvus
+Zilliz
+技術概要
+このモノレポは、主に3つのセクションで構成されています:
+`frontend`: LLMが使用できるすべてのコンテンツを簡単に作成および管理できるviteJS + Reactフロントエンド。
+`server`: すべてのインタラクションを処理し、すべてのベクトルDB管理およびLLMインタラクションを行うNodeJS expressサーバー。
+`collector`: UIからドキュメントを処理および解析するNodeJS expressサーバー。
+`docker`: Dockerの指示およびビルドプロセス + ソースからのビルド情報。
+`embed`: 埋め込みウィジェットの生成に特化したコード。
+🛳 セルフホスティング
+Mintplex Labsおよびコミュニティは、AnythingLLMをローカルで実行できる多数のデプロイメント方法、スクリプト、テンプレートを維持しています。以下の表を参照して、お好みの環境でのデプロイ方法を読むか、自動デプロイを行ってください。
+| Docker | AWS | GCP | Digital Ocean | Render.com |
+|----------------------------------------|----|-----|---------------|------------|
+| [![Docker上でデプロイ][docker-btn]][docker-deploy] | [![AWS上でデプロイ][aws-btn]][aws-deploy] | [![GCP上でデプロイ][gcp-btn]][gcp-deploy] | [![DigitalOcean上でデプロイ][do-btn]][do-deploy] | [![Render.com上でデプロイ][render-btn]][render-deploy] |
+| Railway |
+| --------------------------------------------------- |
+| [![Railway上でデプロイ][railway-btn]][railway-deploy] |
+Dockerを使用せずに本番環境のAnythingLLMインスタンスを設定する →
+開発環境のセットアップ方法
+`yarn setup` 各アプリケーションセクションに必要な`.env`ファイルを入力します(リポジトリのルートから)。
+ - 次に進む前にこれらを入力してください。`server/.env.development`が入力されていないと正しく動作しません。
+`yarn dev:server` ローカルでサーバーを起動します(リポジトリのルートから)。
+`yarn dev:frontend` ローカルでフロントエンドを起動します(リポジトリのルートから)。
+`yarn dev:collector` ドキュメントコレクターを実行します(リポジトリのルートから)。
+ドキュメントについて学ぶ
+ベクトルキャッシュについて学ぶ
+貢献する方法
+issueを作成する
+`<issue number>-<short name>`の形式のブランチ名でPRを作成する
+マージしましょう
+テレメトリーとプライバシー
+Mintplex Labs Inc.によって開発されたAnythingLLMには、匿名の使用情報を収集するテレメトリー機能が含まれています。
+<details>
+<summary><kbd>AnythingLLMのテレメトリーとプライバシーについての詳細</kbd></summary>
+なぜ?
+この情報を使用して、AnythingLLMの使用方法を理解し、新機能とバグ修正の優先順位を決定し、AnythingLLMのパフォーマンスと安定性を向上させるのに役立てます。
+オプトアウト
+サーバーまたはdockerの.env設定で`DISABLE_TELEMETRY`を「true」に設定して、テレメトリーからオプトアウトします。アプリ内でも、サイドバー > `プライバシー`に移動してテレメトリーを無効にすることができます。
+明示的に追跡するもの
+製品およびロードマップの意思決定に役立つ使用詳細のみを追跡します。具体的には:
+インストールのタイプ(Dockerまたはデスクトップ)
+ドキュメントが追加または削除されたとき。ドキュメントについての情報はありません。イベントが発生したことのみを知ります。これにより、使用状況を把握できます。
+使用中のベクトルデータベースのタイプ。どのベクトルデータベースプロバイダーが最も使用されているかを知り、更新があったときに優先して変更を行います。
+使用中のLLMのタイプ。最も人気のある選択肢を知り、更新があったときに優先して変更を行います。
+チャットが送信された。これは最も一般的な「イベント」であり、すべてのインストールでのこのプロジェクトの日常的な「アクティビティ」についてのアイデアを提供します。再び、イベントのみが送信され、チャット自体の性質や内容に関する情報はありません。
+これらの主張を検証するには、`Telemetry.sendTelemetry`が呼び出されるすべての場所を見つけてください。また、これらのイベントは出力ログに書き込まれるため、送信された具体的なデータも確認できます。IPアドレスやその他の識別情報は収集されません。テレメトリープロバイダーはPostHogです。
+ソースコード内のすべてのテレメトリーイベントを表示
+</details>
+🔗 その他の製品
+**[VectorAdmin][vector-admin]**:ベクトルデータベースを管理するためのオールインワンGUIおよびツールスイート。
+**[OpenAI Assistant Swarm][assistant-swarm]**:単一のエージェントから指揮できるOpenAIアシスタントの軍隊に、ライブラリ全体を変換します。
+<div align="right">
+[
+</div>
+Copyright © 2025 [Mintplex Labs][profile-link]。<br />
+このプロジェクトはMITライセンスの下でライセンスされています。
+<!-- LINK GROUP -->
+[back-to-top]: 
+[profile-link]: 
+[vector-admin]: 
+[assistant-swarm]: 
+[docker-btn]: ./images/deployBtns/docker.png
+[docker-deploy]: ./docker/HOW_TO_USE_DOCKER.md
+[aws-btn]: ./images/deployBtns/aws.png
+[aws-deploy]: ./cloud-deployments/aws/cloudformation/DEPLOY.md
+[gcp-btn]: 
+[gcp-deploy]: ./cloud-deployments/gcp/deployment/DEPLOY.md
+[do-btn]: 
+[do-deploy]: ./cloud-deployments/digitalocean/terraform/DEPLOY.md
+[render-btn]: 
+[render-deploy]: 
+[render-btn]: 
+[render-deploy]: 
+[railway-btn]: 
+[railway-deploy]:
+
+
+===== C:\Users\Breno\AppData\Local\Temp\repo_1u3zfsju\repo\locales\README.tr-TR.md =====
+<a name="readme-top"></a>
+<p align="center">
+ <a href=" src=" alt="AnythingLLM logo"></a>
+</p>
+<div align='center'>
+<a href=" target="_blank"><img src=" alt="Mintplex-Labs%2Fanything-llm | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+</div>
+<p align="center">
+<b>AnythingLLM:</b> Aradığınız hepsi bir arada yapay zeka uygulaması.<br />
+Belgelerinizle sohbet edin, yapay zeka ajanlarını kullanın, son derece özelleştirilebilir, çok kullanıcılı ve zahmetsiz kurulum!
+</p>
+<p align="center">
+ <a href=" target="_blank">
+ <img src=" alt="Discord">
+ </a> |
+ <a href=" target="_blank">
+ <img src=" alt="License">
+ </a> |
+ <a href=" target="_blank">
+ Docs
+ </a> |
+ <a href=" target="_blank">
+ Hosted Instance
+ </a>
+</p>
+<p align="center">
+ <b>English</b> · <a href='./locales/README.zh-CN.md'>简体中文</a> · <a href='./locales/README.ja-JP.md'>日本語</a> · <a href='./locales/README.tr-TR.md'>Turkish</a>
+</p>
+<p align="center"> 
+👉 Masaüstü için AnythingLLM (Mac, Windows ve Linux)! <a href=" target="_blank"> Şimdi İndir</a> 
+</p> 
+Herhangi bir belgeyi, kaynağı veya içeriği sohbet sırasında herhangi bir büyük dil modelinin referans olarak kullanabileceği bir bağlama dönüştürmenizi sağlayan tam kapsamlı bir uygulama. Bu uygulama, kullanmak istediğiniz LLM veya Vektör Veritabanını seçmenize olanak tanırken, çok kullanıcılı yönetim ve yetkilendirme desteği de sunar.
+<details>
+<summary><kbd>Demoyu izle!</kbd></summary>
+[](
+</details>
+Ürün Genel Bakışı 
+AnythingLLM, ticari hazır büyük dil modellerini veya popüler açık kaynak LLM'leri ve vektör veritabanı çözümlerini kullanarak, hiçbir ödün vermeden özel bir ChatGPT oluşturmanıza olanak tanıyan tam kapsamlı bir uygulamadır. Bu uygulamayı yerel olarak çalıştırabilir veya uzaktan barındırarak sağladığınız belgelerle akıllı sohbetler gerçekleştirebilirsiniz. 
+AnythingLLM, belgelerinizi **"çalışma alanları" (workspaces)** adı verilen nesnelere ayırır. Bir çalışma alanı, bir sohbet dizisi gibi çalışır ancak belgelerinizi kapsülleyen bir yapı sunar. Çalışma alanları belgeleri paylaşabilir, ancak birbirleriyle iletişim kurmaz, böylece her çalışma alanının bağlamını temiz tutabilirsiniz. 
+AnythingLLM’in Harika Özellikleri 
+🆕 **Özel Yapay Zeka Ajanları** 
+🆕 **Kod yazmadan AI Ajanı oluşturma aracı** 
+🖼️ **Çoklu-mod desteği (hem kapalı kaynak hem de açık kaynak LLM'ler!)** 
+👤 Çok kullanıcılı destek ve yetkilendirme _(Yalnızca Docker sürümünde)_ 
+🦾 Çalışma alanı içinde ajanlar (web'de gezinme vb.) 
+💬 Web sitenize gömülebilir özel sohbet aracı _(Yalnızca Docker sürümünde)_ 
+📖 Çoklu belge türü desteği (PDF, TXT, DOCX vb.) 
+Sade ve kullanışlı sohbet arayüzü, sürükle-bırak özelliği ve net kaynak gösterimi. 
+%100 bulut konuşlandırmaya hazır. 
+Tüm popüler kapalı ve açık kaynak LLM sağlayıcılarıyla uyumlu. 
+Büyük belgeleri yönetirken zaman ve maliyet tasarrufu sağlayan dahili optimizasyonlar. 
+Özel entegrasyonlar için tam kapsamlı Geliştirici API’si. 
+Ve çok daha fazlası... Kurup keşfedin!
+Desteklenen LLM'ler, Embedding Modelleri, Konuşma Modelleri ve Vektör Veritabanları 
+Büyük Dil Modelleri (LLMs):**
+Any open-source llama.cpp compatible model
+OpenAI
+OpenAI (Generic)
+Azure OpenAI
+AWS Bedrock
+Anthropic
+NVIDIA NIM (chat models)
+Google Gemini Pro
+Hugging Face (chat models)
+Ollama (chat models)
+LM Studio (all models)
+LocalAi (all models)
+Together AI (chat models)
+Fireworks AI (chat models)
+Perplexity (chat models)
+OpenRouter (chat models)
+DeepSeek (chat models)
+Mistral
+Groq
+Cohere
+KoboldCPP
+LiteLLM
+Text Generation Web UI
+Apipie
+xAI
+Novita AI (chat models)
+PPIO
+Embedder modelleri:**
+AnythingLLM Native Embedder (default)
+OpenAI
+Azure OpenAI
+LocalAi (all)
+Ollama (all)
+LM Studio (all)
+Cohere
+Ses Transkripsiyon Modelleri:**
+AnythingLLM Built-in (default)
+OpenAI
+TTS (text-to-speech) desteği:**
+Native Browser Built-in (default)
+PiperTTSLocal - runs in browser
+OpenAI TTS
+ElevenLabs
+Any OpenAI Compatible TTS service.
+STT (speech-to-text) desteği:**
+Native Browser Built-in (default)
+Vektör Databases:**
+LanceDB (default)
+PGVector
+Astra DB
+Pinecone
+Chroma
+Weaviate
+Qdrant
+Milvus
+Zilliz
+Teknik Genel Bakış 
+Bu monorepo üç ana bölümden oluşmaktadır: 
+**`frontend`**: ViteJS + React tabanlı bir ön yüz, LLM'in kullanabileceği tüm içeriği kolayca oluşturup yönetmenizi sağlar. 
+**`server`**: NodeJS ve Express tabanlı bir sunucu, tüm etkileşimleri yönetir ve vektör veritabanı işlemleri ile LLM entegrasyonlarını gerçekleştirir. 
+**`collector`**: Kullanıcı arayüzünden gelen belgeleri işleyen ve ayrıştıran NodeJS Express tabanlı bir sunucu. 
+**`docker`**: Docker kurulum talimatları, derleme süreci ve kaynak koddan nasıl derleneceğine dair bilgiler içerir. 
+**`embed`**: Web gömme widget’ı oluşturma ve entegrasyonu için alt modül. 
+**`browser-extension`**: Chrome tarayıcı eklentisi için alt modül.
+🛳 Kendi Sunucunuzda Barındırma 
+Mintplex Labs ve topluluk, AnythingLLM'i yerel olarak çalıştırmak için çeşitli dağıtım yöntemleri, betikler ve şablonlar sunmaktadır. Aşağıdaki tabloya göz atarak tercih ettiğiniz ortamda nasıl dağıtım yapabileceğinizi öğrenebilir veya otomatik dağıtım seçeneklerini keşfedebilirsiniz.
+| Docker | AWS | GCP | Digital Ocean | Render.com |
+|----------------------------------------|----|-----|---------------|------------|
+| [![Deploy on Docker][docker-btn]][docker-deploy] | [![Deploy on AWS][aws-btn]][aws-deploy] | [![Deploy on GCP][gcp-btn]][gcp-deploy] | [![Deploy on DigitalOcean][do-btn]][do-deploy] | [![Deploy on Render.com][render-btn]][render-deploy] |
+| Railway | RepoCloud | Elestio |
+| --- | --- | --- |
+| [![Deploy on Railway][railway-btn]][railway-deploy] | [![Deploy on RepoCloud][repocloud-btn]][repocloud-deploy] | [![Deploy on Elestio][elestio-btn]][elestio-deploy] |
+veya Docker kullanmadan üretim ortamında AnythingLLM kurun → 
+Geliştirme İçin Kurulum 
+`yarn setup` → Uygulamanın her bileşeni için gerekli `.env` dosyalarını oluşturur (repo’nun kök dizininden çalıştırılmalıdır). 
+ - Devam etmeden önce bu dosyaları doldurun. **Özellikle `server/.env.development` dosyasının doldurulduğundan emin olun**, aksi takdirde sistem düzgün çalışmaz. 
+`yarn dev:server` → Sunucuyu yerel olarak başlatır (repo’nun kök dizininden çalıştırılmalıdır). 
+`yarn dev:frontend` → Ön yüzü yerel olarak çalıştırır (repo’nun kök dizininden çalıştırılmalıdır). 
+`yarn dev:collector` → Belge toplayıcıyı çalıştırır (repo’nun kök dizininden çalıştırılmalıdır). 
+Belgeler hakkında bilgi edinin 
+Vektör önbellekleme hakkında bilgi edinin 
+Harici Uygulamalar ve Entegrasyonlar 
+_Bu uygulamalar Mintplex Labs tarafından yönetilmemektedir, ancak AnythingLLM ile uyumludur. Burada listelenmeleri bir onay anlamına gelmez._ 
+Midori AI Alt Sistem Yöneticisi - Docker konteyner teknolojisini kullanarak yapay zeka sistemlerini verimli bir şekilde dağıtmanın pratik bir yolu. 
+Coolify - Tek tıklamayla AnythingLLM dağıtımı yapmanıza olanak tanır. 
+GPTLocalhost for Microsoft Word - AnythingLLM’i Microsoft Word içinde kullanmanıza olanak tanıyan yerel bir Word eklentisi.
+Telemetri ve Gizlilik 
+Mintplex Labs Inc. tarafından geliştirilen AnythingLLM, anonim kullanım bilgilerini toplayan bir telemetri özelliği içermektedir. 
+<details> 
+<summary><kbd>AnythingLLM için Telemetri ve Gizlilik hakkında daha fazla bilgi</kbd></summary> 
+Neden? 
+Bu bilgileri, AnythingLLM’in nasıl kullanıldığını anlamak, yeni özellikler ve hata düzeltmelerine öncelik vermek ve uygulamanın performansını ve kararlılığını iyileştirmek için kullanıyoruz. 
+Telemetriden Çıkış Yapma (Opt-Out) 
+Sunucu veya Docker `.env` ayarlarında `DISABLE_TELEMETRY` değerini "true" olarak ayarlayarak telemetriyi devre dışı bırakabilirsiniz. Ayrıca, uygulama içinde **Kenar Çubuğu > Gizlilik** bölümüne giderek de bu özelliği kapatabilirsiniz. 
+Hangi Verileri Açıkça Takip Ediyoruz? 
+Yalnızca ürün ve yol haritası kararlarını almamıza yardımcı olacak kullanım detaylarını takip ediyoruz: 
+Kurulum türü (Docker veya Masaüstü) 
+Bir belgenin eklenme veya kaldırılma olayı. **Belgenin içeriği hakkında hiçbir bilgi toplanmaz**, yalnızca olayın gerçekleştiği kaydedilir. Bu, kullanım sıklığını anlamamıza yardımcı olur. 
+Kullanılan vektör veritabanı türü. Hangi sağlayıcının daha çok tercih edildiğini belirlemek için bu bilgiyi topluyoruz. 
+Kullanılan LLM türü. En popüler modelleri belirleyerek bu sağlayıcılara öncelik verebilmemizi sağlar. 
+Sohbet başlatılması. Bu en sık gerçekleşen "olay" olup, projenin günlük etkinliği hakkında genel bir fikir edinmemize yardımcı olur. **Yalnızca olay kaydedilir, sohbetin içeriği veya doğası hakkında hiçbir bilgi toplanmaz.** 
+Bu verileri doğrulamak için kod içinde **`Telemetry.sendTelemetry` çağrılarını** inceleyebilirsiniz. Ayrıca, bu olaylar günlük kaydına yazıldığı için hangi verilerin gönderildiğini görebilirsiniz (eğer etkinleştirilmişse). **IP adresi veya diğer tanımlayıcı bilgiler toplanmaz.** Telemetri sağlayıcısı, açık kaynaklı bir telemetri toplama hizmeti olan PostHog‘dur. 
+Kaynak kodda tüm telemetri olaylarını görüntüle
+</details>
+👋 Katkıda Bulunma 
+Bir **issue** oluşturun. 
+`<issue numarası>-<kısa ad>` formatında bir **PR (Pull Request)** oluşturun. 
+Çekirdek ekipten **LGTM (Looks Good To Me)** onayı alın. 
+🌟 Katkıda Bulunanlar 
+[]( 
+[]( 
+🔗 Diğer Ürünler 
+**[VectorAdmin][vector-admin]:** Vektör veritabanlarını yönetmek için hepsi bir arada GUI ve araç paketi. 
+**[OpenAI Assistant Swarm][assistant-swarm]:** Tüm OpenAI asistanlarınızı tek bir ajan tarafından yönetilen bir yapay zeka ordusuna dönüştürün. 
+<div align="right"> 
+[ 
+</div> 
+Telif Hakkı © 2025 [Mintplex Labs][profile-link]. <br /> 
+Bu proje MIT lisansı ile lisanslanmıştır.
+<!-- LINK GROUP -->
+[back-to-top]: 
+[profile-link]: 
+[vector-admin]: 
+[assistant-swarm]: 
+[docker-btn]: ./images/deployBtns/docker.png
+[docker-deploy]: ./docker/HOW_TO_USE_DOCKER.md
+[aws-btn]: ./images/deployBtns/aws.png
+[aws-deploy]: ./cloud-deployments/aws/cloudformation/DEPLOY.md
+[gcp-btn]: 
+[gcp-deploy]: ./cloud-deployments/gcp/deployment/DEPLOY.md
+[do-btn]: 
+[do-deploy]: ./cloud-deployments/digitalocean/terraform/DEPLOY.md
+[render-btn]: 
+[render-deploy]: 
+[render-btn]: 
+[render-deploy]: 
+[railway-btn]: 
+[railway-deploy]: 
+[repocloud-btn]: 
+[repocloud-deploy]: 
+[elestio-btn]: 
+[elestio-deploy]:
+
+
+===== C:\Users\Breno\AppData\Local\Temp\repo_1u3zfsju\repo\locales\README.zh-CN.md =====
+<a name="readme-top"></a>
+<p align="center">
+ <a href=" src=" alt="AnythingLLM logo"></a>
+</p>
+<div align='center'>
+<a href=" target="_blank"><img src=" alt="Mintplex-Labs%2Fanything-llm | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+</div>
+<p align="center">
+ <b>AnythingLLM:</b> 您一直在寻找的全方位AI应用程序。<br />
+ 与您的文档聊天,使用AI代理,高度可配置,多用户,无需繁琐的设置。
+</p>
+<p align="center">
+	<a href=" target="_blank">
+ <img src=" alt="Discord">
+ </a> |
+ <a href=" target="_blank">
+ <img src=" alt="许可证">
+ </a> |
+ <a href=" target="_blank">
+ 文档
+ </a> |
+ <a href=" target="_blank">
+ 托管实例
+ </a>
+</p>
+<p align="center">
+ <a href='../README.md'>English</a> · <b>简体中文</b> · <a href='./README.ja-JP.md'>日本語</a>
+</p>
+<p align="center">
+👉 适用于桌面(Mac、Windows和Linux)的AnythingLLM!<a href=" target="_blank">立即下载</a>
+</p>
+这是一个全栈应用程序,可以将任何文档、资源(如网址链接、音频、视频)或内容片段转换为上下文,以便任何大语言模型(LLM)在聊天期间作为参考使用。此应用程序允许您选择使用哪个LLM或向量数据库,同时支持多用户管理并设置不同权限。
+<details>
+<summary><kbd>观看演示视频!</kbd></summary>
+[](
+</details>
+产品概览
+AnythingLLM是一个全栈应用程序,您可以使用现成的商业大语言模型或流行的开源大语言模型,再结合向量数据库解决方案构建一个私有ChatGPT,不再受制于人:您可以本地运行,也可以远程托管,并能够与您提供的任何文档智能聊天。
+AnythingLLM将您的文档划分为称为`workspaces` (工作区)的对象。工作区的功能类似于线程,同时增加了文档的容器化。工作区可以共享文档,但工作区之间的内容不会互相干扰或污染,因此您可以保持每个工作区的上下文清晰。
+AnythingLLM的一些酷炫特性
+🆕 **完全兼容 MCP**
+🆕 **无代码AI代理构建器**
+🖼️ **多用户实例支持和权限管理(支持封闭源和开源LLM!)**
+**自定义人工智能代理**
+👤 多用户实例支持和权限管理 _仅限Docker版本_
+🦾 工作区内的智能体(浏览网页、运行代码等)
+💬 为您的网站定制的可嵌入聊天窗口
+📖 支持多种文档类型(PDF、TXT、DOCX等)
+带有拖放功能和清晰引用的简洁聊天界面。
+100%云部署就绪。
+兼容所有主流的闭源和开源大语言模型提供商。
+内置节省成本和时间的机制,用于处理超大文档,优于任何其他聊天界面。
+全套的开发人员API,用于自定义集成!
+而且还有更多精彩功能......安装后亲自体验吧!
+支持的LLM、嵌入模型、转录模型和向量数据库
+支持的LLM:**
+任何与llama.cpp兼容的开源模型
+OpenAI
+OpenAI (通用)
+Azure OpenAI
+AWS Bedrock
+Anthropic
+NVIDIA NIM (聊天模型)
+Google Gemini Pro
+Hugging Face (聊天模型)
+Ollama (聊天模型)
+LM Studio (所有模型)
+LocalAI (所有模型)
+Together AI (聊天模型)
+Fireworks AI (聊天模型)
+Perplexity (聊天模型)
+OpenRouter (聊天模型)
+DeepSeek (聊天模型)
+Mistral
+Groq
+Cohere
+KoboldCPP
+LiteLLM
+Text Generation Web UI
+Apipie
+xAI
+Novita AI (聊天模型)
+PPIO (聊天模型)
+CometAPI (聊天模型)
+支持的嵌入模型:**
+AnythingLLM原生嵌入器(默认)
+OpenAI
+Azure OpenAI
+LocalAI (全部)
+Ollama (全部)
+LM Studio (全部)
+Cohere
+支持的转录模型:**
+AnythingLLM内置 (默认)
+OpenAI
+TTS (文本转语音) 支持:**
+浏览器内置(默认)
+PiperTTSLocal - 在浏览器中运行
+OpenAI TTS
+ElevenLabs
+任何与 OpenAI 兼容的 TTS 服务
+STT (语音转文本) 支持:**
+浏览器内置(默认)
+支持的向量数据库:**
+LanceDB (默认)
+PGVector
+Astra DB
+Pinecone
+Chroma
+Weaviate
+QDrant
+Milvus
+Zilliz
+技术概览
+这个单库由六个主要部分组成:
+`frontend`: 一个 viteJS + React 前端,您可以运行它来轻松创建和管理LLM可以使用的所有内容。
+`server`: 一个 NodeJS express 服务器,用于处理所有交互并进行所有向量数据库管理和 LLM 交互。
+`collector`: NodeJS express 服务器,用于从UI处理和解析文档。
+`docker`: Docker 指令和构建过程 + 从源代码构建的信息。
+`embed`: 用于生成和创建网页嵌入组件的子模块.
+`browser-extension`: 用于Chrome 浏览器扩展的子模块.
+🛳 自托管
+Mintplex Labs和社区维护了许多部署方法、脚本和模板,您可以使用它们在本地运行AnythingLLM。请参阅下面的表格,了解如何在您喜欢的环境上部署,或自动部署。
+| Docker | AWS | GCP | Digital Ocean | Render.com |
+|----------------------------------------|----|-----|---------------|------------|
+| [![在 Docker 上部署][docker-btn]][docker-deploy] | [![在 AWS 上部署][aws-btn]][aws-deploy] | [![在 GCP 上部署][gcp-btn]][gcp-deploy] | [![在DigitalOcean上部署][do-btn]][do-deploy] | [![在 Render.com 上部署][render-btn]][render-deploy] |
+| Railway | RepoCloud | Elestio |
+| --- | --- | --- |
+| [![在 Railway 上部署][railway-btn]][railway-deploy] | [![在 RepoCloud 上部署][repocloud-btn]][repocloud-deploy] | [![在 Elestio 上部署][elestio-btn]][elestio-deploy] |
+其他方案:不使用Docker配置AnythingLLM实例 →
+如何设置开发环境
+`yarn setup` 填充每个应用程序部分所需的 `.env` 文件(从仓库的根目录)。
+ - 在开始下一步之前,先填写这些信息`server/.env.development`,不然代码无法正常执行。
+`yarn dev:server` 在本地启动服务器(从仓库的根目录)。
+`yarn dev:frontend` 在本地启动前端(从仓库的根目录)。
+`yarn dev:collector` 然后运行文档收集器(从仓库的根目录)。
+了解文档
+了解向量缓存
+外部应用与集成
+_以下是一些与 AnythingLLM 兼容的应用程序,但并非由 Mintplex Labs 维护。列在此处并不代表官方背书。_
+Midori AI 子系统管理器 - 使用 Docker 容器技术高效部署 AI 系统的简化方式 - 使用 Docker 容器技术高效部署 AI 系统的简化方式。
+Coolify - 一键部署 AnythingLLM。
+适用于 Microsoft Word 的 GPTLocalhost - 一个本地 Word 插件,让你可以在 Microsoft Word 中使用 AnythingLLM。
+远程信息收集与隐私保护
+由 Mintplex Labs Inc 开发的 AnythingLLM 包含一个收集匿名使用信息的 Telemetry 功能。
+<details>
+<summary><kbd>有关 AnythingLLM 的远程信息收集与隐私保护更多信息</kbd></summary>
+为什么收集信息?
+我们使用这些信息来帮助我们理解 AnythingLLM 的使用情况,帮助我们确定新功能和错误修复的优先级,并帮助我们提高 AnythingLLM 的性能和稳定性。
+怎样关闭
+在服务器或 Docker 的 .env 设置中将 `DISABLE_TELEMETRY` 设置为 "true",即可选择不参与遥测数据收集。你也可以在应用内通过以下路径操作:侧边栏 > `Privacy` (隐私) > 关闭遥测功能。
+你们跟踪收集哪些信息?
+我们只会跟踪有助于我们做出产品和路线图决策的使用细节,具体包括:
+您的安装方式(Docker或桌面版)
+文档被添加或移除的时间。但不包括文档内的具体内容。我们只关注添加或移除文档这个行为。这些信息能让我们了解到文档功能的使用情况。
+使用中的向量数据库类型。让我们知道哪个向量数据库最受欢迎,并在后续更新中优先考虑相应的数据库。
+使用中的LLM类型。让我们知道谁才是最受欢迎的LLM模型,并在后续更新中优先考虑相应模型。
+信息被`发送`出去。这是最常规的“事件/行为/event”,并让我们了解到所有安装了这个项目的每日活动情况。同样,只收集`发送`这个行为的信息,我们不会收集关于聊天本身的性质或内容的任何信息。
+您可以通过查找所有调用`Telemetry.sendTelemetry`的位置来验证这些声明。此外,如果启用,这些事件也会被写入输出日志,因此您也可以看到发送了哪些具体数据。**IP或其他识别信息不会被收集**。Telemetry远程信息收集的方案来自PostHog - 一个开源的远程信息收集服务。
+我们非常重视隐私,且不用烦人的弹窗问卷来获取反馈,希望你能理解为什么我们想要知道该工具的使用情况,这样我们才能打造真正值得使用的产品。所有匿名数据 _绝不会_ 与任何第三方共享。
+在源代码中查看所有信息收集活动
+</details>
+👋 如何贡献
+创建 issue
+创建 PR,分支名称格式为 `<issue number>-<short name>`
+合并
+💖 赞助商
+高级赞助商
+<!-- premium-sponsors (reserved for $100/mth sponsors who request to be called out here and/or are non-private sponsors) -->
+<a href=" target="_blank">
+ <img src=" height="100px" alt="User avatar: DCS DIGITAL" />
+</a>
+<!-- premium-sponsors -->
+所有赞助商
+<!-- all-sponsors --><a href=" src=" width="60px" alt="User avatar: Jascha" /></a><a href=" src=" width="60px" alt="User avatar: KickAss" /></a><a href=" src=" width="60px" alt="User avatar: ShadowArcanist" /></a><a href=" src=" width="60px" alt="User avatar: Atlas" /></a><a href=" src=" width="60px" alt="User avatar: Predrag Stojadinović" /></a><a href=" src=" width="60px" alt="User avatar: Diego Spinola" /></a><a href=" src=" width="60px" alt="User avatar: Kyle" /></a><a href=" src=" width="60px" alt="User avatar: Giulio De Pasquale" /></a><a href=" src=" width="60px" alt="User avatar: " /></a><a href=" src=" width="60px" alt="User avatar: MacStadium" /></a><a href=" src=" width="60px" alt="User avatar: " /></a><a href=" src=" width="60px" alt="User avatar: " /></a><a href=" src=" width="60px" alt="User avatar: " /></a><a href=" src=" width="60px" alt="User avatar: " /></a><a href=" src=" width="60px" alt="User avatar: Dennis" /></a><a href=" src=" width="60px" alt="User avatar: Michael Hamilton, Ph.D." /></a><a href=" src=" width="60px" alt="User avatar: " /></a><a href=" src=" width="60px" alt="User avatar: TernaryLabs" /></a><a href=" src=" width="60px" alt="User avatar: Daniel Cela" /></a><a href=" src=" width="60px" alt="User avatar: Alesso" /></a><a href=" src=" width="60px" alt="User avatar: Rune Mathisen" /></a><a href=" src=" width="60px" alt="User avatar: " /></a><a href=" src=" width="60px" alt="User avatar: " /></a><a href=" src=" width="60px" alt="User avatar: Alan" /></a><a href=" src=" width="60px" alt="User avatar: Damien Peters" /></a><a href=" src=" width="60px" alt="User avatar: DCS Digital" /></a><a href=" src=" width="60px" alt="User avatar: Paul Mcilreavy" /></a><a href=" src=" width="60px" alt="User avatar: Til Wolf" /></a><a href=" src=" width="60px" alt="User avatar: Leopoldo Crhistian Riverin Gomez" /></a><a href=" src=" width="60px" alt="User avatar: AJEsau" /></a><a href=" src=" width="60px" alt="User avatar: Steven VanOmmeren" /></a><a href=" src=" width="60px" alt="User avatar: Casey Boettcher" /></a><a href=" src=" width="60px" alt="User avatar: " /></a><a href=" src=" width="60px" alt="User avatar: Avineet" /></a><!-- all-sponsors -->
+🌟 贡献者们
+[](
+[](
+🔗 更多产品
+**[VectorAdmin][vector-admin]**:一个用于管理向量数据库的全方位图形用户界面和工具套件。
+**[OpenAI Assistant Swarm][assistant-swarm]**:一个智能体就可以管理您所有的OpenAI助手。
+<div align="right">
+[
+</div>
+版权所有 © 2025 [Mintplex Labs][profile-link]。<br />
+本项目采用MIT许可证。
+<!-- LINK GROUP -->
+[back-to-top]: 
+[profile-link]: 
+[vector-admin]: 
+[assistant-swarm]: 
+[docker-btn]: ../images/deployBtns/docker.png
+[docker-deploy]: ../docker/HOW_TO_USE_DOCKER.md
+[aws-btn]: ../images/deployBtns/aws.png
+[aws-deploy]: ../cloud-deployments/aws/cloudformation/DEPLOY.md
+[gcp-btn]: 
+[gcp-deploy]: ../cloud-deployments/gcp/deployment/DEPLOY.md
+[do-btn]: 
+[do-deploy]: ../cloud-deployments/digitalocean/terraform/DEPLOY.md
+[render-btn]: 
+[render-deploy]: 
+[render-btn]: 
+[render-deploy]: 
+[railway-btn]: 
+[railway-deploy]: 
+[repocloud-btn]: 
+[repocloud-deploy]: 
+[elestio-btn]: 
+[elestio-deploy]:
+
+
+===== C:\Users\Breno\AppData\Local\Temp\repo_1u3zfsju\repo\server\storage\README.md =====
+AnythingLLM Storage
+This folder is for the local or disk storage of ready-to-embed documents, vector-cached embeddings, and the disk-storage of LanceDB and the local SQLite database.
+This folder should contain the following folders.
+`documents`
+`lancedb` (if using lancedb)
+`vector-cache`
+and a file named exactly `anythingllm.db`
+Common issues
+SQLITE_FILE_CANNOT_BE_OPENED** in the server log = The DB file does not exist probably because the node instance does not have the correct permissions to write a file to the disk. To solve this..
+Local dev
+ - Create a `anythingllm.db` empty file in this directory. Thats all. No need to reboot the server or anything. If your permissions are correct this should not ever occur since the server will create the file if it does not exist automatically.
+Docker Instance
+ - Get your AnythingLLM docker container id with `docker ps -a`. The container must be running to execute the next commands.
+ - Run `docker container exec -u 0 -t <ANYTHINGLLM DOCKER CONTAINER ID> mkdir -p /app/server/storage /app/server/storage/documents /app/server/storage/vector-cache /app/server/storage/lancedb`
+ - Run `docker container exec -u 0 -t <ANYTHINGLLM DOCKER CONTAINER ID> touch /app/server/storage/anythingllm.db`
+ - Run `docker container exec -u 0 -t <ANYTHINGLLM DOCKER CONTAINER ID> chown -R anythingllm:anythingllm /app/collector /app/server`
+ - The above commands will create the appropriate folders inside of the docker container and will persist as long as you do not destroy the container and volume. This will also fix any ownership issues of folder files in the collector and the server.
+
+
+===== C:\Users\Breno\AppData\Local\Temp\repo_1u3zfsju\repo\server\storage\documents\DOCUMENTS.md =====
+What is this folder of documents?
+This is a temporary cache of the resulting files you have collected from `collector/`. You really should not be adding files manually to this folder. However the general format of this is you should partion data by how it was collected - it will be added to the appropriate namespace when you undergo vectorizing.
+You can manage these files from the frontend application.
+All files should be JSON files and in general there is only one main required key: `pageContent` all other keys will be inserted as metadata for each document inserted into the vector DB.
+There is also a special reserved key called `published` that should be reserved for timestamps.
+
+
+===== C:\Users\Breno\AppData\Local\Temp\repo_1u3zfsju\repo\server\storage\models\README.md =====
+Native models used by AnythingLLM
+This folder is specifically created as a local cache and storage folder that is used for native models that can run on a CPU.
+Currently, AnythingLLM uses this folder for the following parts of the application.
+Embedding
+When your embedding engine preference is `native` we will use the ONNX **all-MiniLM-L6-v2** model built by Xenova on HuggingFace.co. This model is a quantized and WASM version of the popular all-MiniLM-L6-v2 which produces a 384-dimension vector.
+If you are using the `native` embedding engine your vector database should be configured to accept 384-dimension models if that parameter is directly editable (Pinecone only).
+Audio/Video transcription
+AnythingLLM allows you to upload various audio and video formats as source documents. In all cases the audio tracks will be transcribed by a locally running ONNX model **whisper-small** built by Xenova on HuggingFace.co. The model is a smaller version of the OpenAI Whisper model. Given the model runs locally on CPU, larger files will result in longer transcription times.
+Once transcribed you can embed these transcriptions into your workspace like you would any other file! 
+Other external model/transcription providers are also live.**
+OpenAI Whisper via API key.
+Text generation (LLM selection)
+[!IMPORTANT]
+Use of a locally running LLM model is **experimental** and may behave unexpectedly, crash, or not function at all.
+We suggest for production-use of a local LLM model to use a purpose-built inference server like LocalAI or LMStudio.
+[!TIP]
+We recommend at _least_ using a 4-bit or 5-bit quantized model for your LLM. Lower quantization models tend to
+just output unreadable garbage.
+If you would like to use a local Llama compatible LLM model for chatting you can select any model from this HuggingFace search filter
+Requirements**
+Model must be in the latest `GGUF` format
+Model should be compatible with latest `llama.cpp`
+You should have the proper RAM to run such a model. Requirement depends on model size.
+Where do I put my GGUF model?
+[!IMPORTANT]
+If running in Docker you should be running the container to a mounted storage location on the host machine so you
+can update the storage files directly without having to re-download or re-build your docker container. See suggested Docker config
+[!NOTE]
+`/server/storage/models/downloaded` is the default location that your model files should be at. 
+Your storage directory may differ if you changed the STORAGE_DIR environment variable.
+All local models you want to have available for LLM selection should be placed in the `server/storage/models/downloaded` folder. Only `.gguf` files will be allowed to be selected from the UI.
+
+
+===== C:\Users\Breno\AppData\Local\Temp\repo_1u3zfsju\repo\server\utils\AiProviders\ollama\README.md =====
+Common Issues with Ollama
+If you encounter an error stating `llama:streaming - could not stream chat. Error: connect ECONNREFUSED 172.17.0.1:11434` when using AnythingLLM in a Docker container, this indicates that the IP of the Host inside of the virtual docker network does not bind to port 11434 of the host system by default, due to Ollama's restriction to localhost and 127.0.0.1. To resolve this issue and ensure proper communication between the Dockerized AnythingLLM and the Ollama service, you must configure Ollama to bind to 0.0.0.0 or a specific IP address.
+Setting Environment Variables on Mac
+If Ollama is run as a macOS application, environment variables should be set using `launchctl`:
+1. For each environment variable, call `launchctl setenv`.
+2. Restart the Ollama application.
+Setting Environment Variables on Linux
+If Ollama is run as a systemd service, environment variables should be set using `systemctl`:
+1. Edit the systemd service by calling `systemctl edit ollama.service`. This will open an editor.
+2. For each environment variable, add a line `Environment` under the section `[Service]`:
+3. Save and exit.
+4. Reload `systemd` and restart Ollama:
+Setting Environment Variables on Windows
+On Windows, Ollama inherits your user and system environment variables.
+1. First, quit Ollama by clicking on it in the taskbar.
+2. Edit system environment variables from the Control Panel.
+3. Edit or create new variable(s) for your user account for `OLLAMA_HOST`, `OLLAMA_MODELS`, etc.
+4. Click OK/Apply to save.
+5. Run `ollama` from a new terminal window.
+
+
+===== C:\Users\Breno\AppData\Local\Temp\repo_1u3zfsju\repo\server\utils\prisma\PRISMA.md =====
+Prisma Setup and Usage Guide
+This guide will help you set up and use Prisma for the project. Prisma is a powerful ORM for Node.js and TypeScript, helping developers build faster and make fewer errors. Follow the guide to understand how to use Prisma and the scripts available in the project to manage the Prisma setup.
+Setting Up Prisma
+To get started with setting up Prisma, you should run the setup script from the project root directory:
+This script will install the necessary node modules in both the server and frontend directories, set up the environment files, and set up Prisma (generate client, run migrations, and seed the database).
+Prisma Scripts
+In the project root's `package.json`, there are several scripts set up to help you manage Prisma:
+**prisma:generate**: Generates the Prisma client.
+**prisma:migrate**: Runs the migrations to ensure the database is in sync with the schema.
+**prisma:seed**: Seeds the database with initial data.
+**prisma:setup**: A convenience script that runs `prisma:generate`, `prisma:migrate`, and `prisma:seed` in sequence.
+**sqlite:migrate**: (To be run from the `server` directory) This script is for users transitioning from the old SQLite custom ORM setup to Prisma and will migrate all existing data over to Prisma. If you're a new user, your setup will already use Prisma.
+To run any of these scripts, use `yarn` followed by the script name from the project root directory. For example:
+Manual Prisma Commands
+While the scripts should cover most of your needs, you may sometimes want to run Prisma commands manually. Here are some commands you might find useful, along with their descriptions:
+`npx prisma introspect`: Introspects the database to update the Prisma schema by reading the schema of the existing database.
+`npx prisma generate`: Generates the Prisma client.
+`npx prisma migrate dev --name init`: Ensures the database is in sync with the schema, naming the migration 'init'.
+`npx prisma migrate reset`: Resets the database, deleting all data and recreating the schema.
+These commands should be run from the `server` directory, where the Prisma schema is located.
+Notes
+Always make sure to run scripts from the root level to avoid path issues.
+Before running migrations, ensure that the Prisma schema is correctly defined to prevent data loss or corruption.
+If you are adding a new feature or making changes that require a change in the database schema, create a new migration rather than editing existing migrations.
+For users transitioning from the old SQLite ORM, navigate to the `server` directory and run the `sqlite:migrate` script to smoothly transition to Prisma. If you're setting up the project fresh, this step is unnecessary as the setup will already be using Prisma.
+
+
+===== C:\Users\Breno\AppData\Local\Temp\repo_1u3zfsju\repo\server\utils\vectorDbProviders\astra\ASTRA_SETUP.md =====
+How to setup Astra Vector Database for AnythingLLM
+Official Astra DB Docs for reference.
+How to get started
+Requirements**
+Astra Vector Database with active status.
+Instructions**
+Create an Astra account or sign in to an existing Astra account
+Create an Astra Serverless(Vector) Database.
+Make sure DB is in active state.
+Get `API ENDPOINT`and `Application Token` from Overview screen
+
+
+===== C:\Users\Breno\AppData\Local\Temp\repo_1u3zfsju\repo\server\utils\vectorDbProviders\chroma\CHROMA_SETUP.md =====
+How to setup a local (or remote) Chroma Vector Database
+Official Chroma Docs for reference.
+How to get started
+Requirements**
+Docker
+`git` available in your CLI/terminal
+Instructions**
+`git clone git@github.com:chroma-core/chroma.git` to somewhere on computer.
+`cd chroma`
+`docker-compose up -d --build`
+set the `CHROMA_ENDPOINT=` .env variable in `server` and also set `VECTOR_DB=` to `chroma`.
+If you have an API Gateway or auth middleway be sure to set the `CHROMA_API_HEADER` and `CHROMA_API_KEY` keys.
+eg: `server/.env.development`
+
+
+===== C:\Users\Breno\AppData\Local\Temp\repo_1u3zfsju\repo\server\utils\vectorDbProviders\milvus\MILVUS_SETUP.md =====
+How to setup a local (or remote) Milvus Vector Database
+Official Milvus Docs for reference.
+How to get started
+Requirements**
+Choose one of the following
+Cloud
+ - Cloud account
+Local
+ - Docker
+ - `git` available in your CLI/terminal
+Instructions**
+Cloud
+ - Create a Cluster on your cloud account
+ - Get connect Public Endpoint and Token
+ - Set .env.development variable in server
+Local
+ - Download yaml file `wget -O docker-compose.yml`
+ - Start Milvus `sudo docker compose up -d`
+ - Check the containers are up and running `sudo docker compose ps`
+ - Get port number and set .env.development variable in server
+eg: `server/.env.development`
+
+
+===== C:\Users\Breno\AppData\Local\Temp\repo_1u3zfsju\repo\server\utils\vectorDbProviders\pgvector\SETUP.md =====
+Setting up `PGVector` for AnythingLLM
+Setting up PGVector for anythingllm to use as your vector database is quite easy. At a minimum, you will need the following:
+PostgreSQL v12+
+`pgvector` extension installed on DB
+User with DB table creation perms and READ access
+Setup on Mac (example)
+Install pgvector extension on PostgreSQL DB
+Set PG as your vector db
+_this can be done via the UI or by directly editing the `.env` file_
+First, obtain a valid connection string for the user, credentials, and db you want to target.
+eg: `postgresql://dbuser:dbuserpass@localhost:5432/yourdb`
+[!IMPORTANT]
+If you have an existing table that you want to use as a vector database, AnythingLLM **requires** that the table be
+at least minimally conform to the expected schema - this can be seen in the index.js file.
+_optional_ - set a table name you wish to have AnythingLLM store vectors to. By default this is `anythingllm_vectors`
+Common Questions
+I cannot connect to the DB (Running AnythingLLM in Docker)
+If you are running AnythingLLM in Docker, you will need to ensure that the DB is accessible from the container.
+If you are running your DB in another Docker container **or** on the host machine, you will need to ensure that the container can access the DB.
+`localhost` will not work in this case as it will attempt to connect to the DB _inside the AnythingLLM container_ instead of the host machine or another container.
+You will need to use the `host.docker.internal` (or `172.17.0.1` on Linux/Ubuntu) address.
+Can I use an existing table as a vector database?
+Yes, you can use an existing table as a vector database. However, AnythingLLM **requires** that the table be at least minimally conform to the expected schema - this can be seen in the index.js file.
+It is **absolutely critical** that the `embedding` column's `VECTOR(XXXX)` dimensions match the dimension of the embedder in AnythingLLM. The default embedding model is 384 dimensions. However, if you are using a custom embedder, you will need to ensure that the dimension value is set correctly.
+Validate the connection to the database
+When setting the connection string in or table name via the AnythingLLM UI, the following validations will be attempted:
+Validate the connection string
+Validate the table name
+Run test connection to ensure the table exists and is accessible by the connection string used
+Check if the table name already exists and if so, validate that it is an embedding table with the correct schema
+My embedding table is not present in the DB
+The embedding storage table is created by AnythingLLM **on the first upsert** of a vector. If you have not yet embedding any documents, the table will not be present in the DB.
+How do I reset my vector database?
+_at the workspace level in Settings > Vector Database_
+You can use the "Reset Vector Database" button in the AnythingLLM UI to reset your vector database. This will drop all vectors within that workspace, but the table will remain in the DB.
+_reset the vector database at the db level_
+For this, you will need to `DROP TABLE` from the command line or however you manage your DB. Once the table is dropped, it will be recreated by AnythingLLM on the next upsert.
+Troubleshooting
+Cannot connect to DB
+Ensure the connection string is valid
+Ensure the user has access to the database
+Ensure the pgvector extension is installed
+Cannot create table
+Ensure the user has `CREATE TABLE` permissions
+Cannot insert vector
+Ensure the user has `INSERT` permissions in the database
+Ensure the table has a dimension value set and this matches the dimension of the embedder in AnythingLLM
+Ensure the table has a vector column set
+Cannot query vector
+Ensure the user has `SELECT` permissions in the database
+Ensure the table has a vector column set
+Ensure the table has a dimension value set and this matches the dimension of the embedder in AnythingLLM
+"type 'vector' does not exist" issues with PGVector
+If you are using the PGVector as your vector database, you may encounter an error similar to the following when embedding documents:
+This is due to the fact that the `vector` type is not installed on the PG database.
+First, follow the instructions in the PGVector README to install the `vector` type on your database.
+Then, you will need to create the extension on the database. This can be done by running the following command:
+
+
+===== C:\Users\Breno\AppData\Local\Temp\repo_1u3zfsju\repo\server\utils\vectorDbProviders\pinecone\PINECONE_SETUP.md =====
+How to setup Pinecone Vector Database for AnythingLLM
+Official Pinecone Docs for reference.
+How to get started
+Requirements**
+Pinecone account with index that allows namespaces.
+Note:** Namespaces are not supported in `gcp-starter` environments and are required to work with AnythingLLM.
+Instructions**
+Create an index on your Pinecone account. Name can be anything eg: `my-primary-index`
+Metric `cosine`
+Dimensions `1536` since we use OpenAI for embeddings
+1 pod, all other default settings are fine.
+
+
+===== C:\Users\Breno\AppData\Local\Temp\repo_1u3zfsju\repo\server\utils\vectorDbProviders\qdrant\QDRANT_SETUP.md =====
+How to setup a local (or cloud) QDrant Vector Database
+Get a QDrant Cloud instance.
+Set up QDrant locally on Docker.
+Fill out the variables in the "Vector Database" tab of settings. Select Qdrant as your provider and fill out the appropriate fields
+with the information from either of the above steps.
+How to get started _Development mode only_
+After setting up either the Qdrant cloud or local dockerized instance you just need to set these variable in `.env.development` or defined them at runtime via the UI.
+
+
+===== C:\Users\Breno\AppData\Local\Temp\repo_1u3zfsju\repo\server\utils\vectorDbProviders\weaviate\WEAVIATE_SETUP.md =====
+How to setup a local (or cloud) Weaviate Vector Database
+Get a Weaviate Cloud instance.
+Set up Weaviate locally on Docker.
+Fill out the variables in the "Vector Database" tab of settings. Select Weaviate as your provider and fill out the appropriate fields
+with the information from either of the above steps.
+How to get started _Development mode only_
+After setting up either the Weaviate cloud or local dockerized instance you just need to set these variable in `.env.development` or defined them at runtime via the UI.

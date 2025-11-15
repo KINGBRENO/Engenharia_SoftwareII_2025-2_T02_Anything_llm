@@ -1,7 +1,6 @@
 import torch
 import psutil
 from transformers import AutoTokenizer, AutoModelForCausalLM
-import listarestrutura as lt
 import time
 import os
 
@@ -10,7 +9,15 @@ prompts_testados = 0
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 ARQUIVO_SAIDA_TXT = os.path.join(BASE_DIR, "..", "..", "resultados", "Llama.txt")
-ARQUIVO_ENTRADA_TXT = os.path.join(BASE_DIR, "..", "..", "entradas", "entrada2.txt")
+
+
+
+entradas_dir = os.path.abspath(os.path.join(BASE_DIR, "..", "..", "entradas"))
+os.makedirs(entradas_dir, exist_ok=True)
+ARQUIVO_ENTRADA_TXT = os.path.join(entradas_dir, "entrada2.txt")
+
+
+print("arquivo de entrada:", ARQUIVO_ENTRADA_TXT)
 
 # Exibe uso de memória
 def mostrar_uso_memoria():
@@ -46,7 +53,7 @@ def executarModelo(input_text):
 #model_path = "Qwen/Qwen2.5-Coder-1.5B-Instruct"
 #model_path = ""  # Modelo no huggingface
 #model_path = r"D:\Windows 3.0\Downloads\Teste 1\Llama-3.2-1B-Instruct" 
-model_path = r"Llama-3.2-1B-Instruct" 
+model_path = "meta-llama/Llama-3.2-1B-Instruct"
 # Utilizei um modelo baixado localmente, altere caso o modelo 
 # esteja em outro diretorio ou no huggingface
 
@@ -73,7 +80,7 @@ mostrar_uso_memoria()
 
 
 
-with open(f"../entradas/entrada2.txt", "r", encoding="utf-8") as f:
+with open(ARQUIVO_ENTRADA_TXT, "r", encoding="utf-8") as f:
    arquivo = f.read()
 
    prompt = f"""

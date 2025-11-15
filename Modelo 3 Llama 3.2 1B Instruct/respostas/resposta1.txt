@@ -631,4 +631,5 @@ server/utils/vectorStore
 
 #### 2. Tipo de Arquitetura:
 
-O projeto segue uma arquitetura monolítica com uma camada de infraestrutura (back-end) e uma camada de aplicação (front-end). A camada de infraestrutura é responsável por gerenciar os serviços, conexões, e integrações externas
+O projeto segue uma arquitetura monolítica com uma camada de infraestrutura (back-end) e uma camada de aplicação (front-end). 
+A camada de infraestrutura é responsável por gerenciar os serviços, conexões, e integrações externas
