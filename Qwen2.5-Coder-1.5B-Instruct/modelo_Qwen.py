@@ -9,14 +9,14 @@ Original file is located at
 Instalação e importação de módulos
 """
 
-#!pip install -q transformers torch accelerate
+!pip install -q transformers torch accelerate
 
 import os
 import torch
 import time
 from transformers import AutoTokenizer, AutoModelForCausalLM
-#from IPython.display import clear_output
-#from google.colab import drive
+from IPython.display import clear_output
+from google.colab import drive
 
 """Antes de prosseguir, verificar se está com a GPU habilitada. A inferência demora demais se estiver usando apenas CPU."""
 
@@ -37,65 +37,9 @@ model = AutoModelForCausalLM.from_pretrained(
     device_map="cuda"
 )
 
-"""Definições de funções úteis: **Geração de árvore de diretórios a partir do repositório clonado** e **função de inferência** com prompt."""
+"""Definição de função de inferência do modelo a partir do prompt."""
 
-def gerar_arvore_diretorios(caminho_raiz, max_depth=3, ignorar=['.git', 'node_modules', 'dist', 'build', 'coverage', 'venv', '.github', 'assets']):
-    tree_str = ""
-    root_level = caminho_raiz.count(os.sep)
-
-    for root, dirs, files in os.walk(caminho_raiz):
-        dirs[:] = [d for d in dirs if d not in ignorar]
-        level = root.count(os.sep) - root_level
-        if level > max_depth:
-            continue
-
-        indent = ' ' * 4 * level
-        tree_str += f"{indent}{os.path.basename(root)}/\n"
-
-        if level < max_depth:
-            subindent = ' ' * 4 * (level + 1)
-            for f in files[:10]:
-                tree_str += f"{subindent}{f}\n"
-            if len(files) > 10:
-                tree_str += f"{subindent}... (+{len(files)-10} arquivos)\n"
-
-    return tree_str
-
-def extrair_resumo_readmes(repo_path, max_chars=2000):
-    readmes_encontrados = ""
-
-    locais_chave = [
-        repo_path,
-        os.path.join(repo_path, "server"),
-        os.path.join(repo_path, "frontend"),
-        os.path.join(repo_path, "collector")
-    ]
-
-    for pasta in locais_chave:
-        caminho_arquivo = os.path.join(pasta, "README.md")
-
-        if os.path.exists(caminho_arquivo):
-            try:
-                with open(caminho_arquivo, "r", encoding="utf-8", errors="ignore") as f:
-                    conteudo = f.read()
-
-                    conteudo = "\n".join([line for line in conteudo.splitlines() if line.strip()])
-
-                    resumo = conteudo[:max_chars]
-
-                    nome_pasta = os.path.basename(pasta)
-                    if nome_pasta == os.path.basename(repo_path):
-                        nome_pasta = "RAIZ DO PROJETO"
-
-                    readmes_encontrados += f"\n--- CONTEÚDO DO README ({nome_pasta}) ---\n"
-                    readmes_encontrados += resumo
-                    readmes_encontrados += "\n... (conteúdo truncado para economizar memória)...\n"
-            except Exception as e:
-                print(f"Erro ao ler {caminho_arquivo}: {e}")
-
-    return readmes_encontrados
-
-def inferir_arquitetura_pela_tree(tree_text, prompt):
+def inferir_arquitetura_pela_tree(prompt):
     messages = [
         {"role": "system", "content": "Você é um especialista em análise de código e padrões arquiteturais."},
         {"role": "user", "content": prompt}
@@ -111,87 +55,71 @@ def inferir_arquitetura_pela_tree(tree_text, prompt):
 
     return tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0].split("assistant")[-1].strip()
 
-"""Clonando repositório objeto da análise"""
+"""Definição das entradas
 
-#!git clone https://github.com/Mintplex-Labs/anything-llm.git
+"""
 
-"""Definição do prompt (en/pt)"""
+input = []
+
+for idx in range(1,5):
+  with open(f"./inputs/entrada{idx}.txt", 'r', encoding="utf-8") as f:
+    input.append(f.read())
+
+"""Montagem do prompt"""
 
 prompt = """
-Analise os artefatos abaixo de um repositório de software:
-1. A estrutura de pastas (Tree).
-2. Trechos dos arquivos de documentação (READMEs).
+Act as a Senior Software Architect.
 
-TAREFA:
-Classifique a arquitetura deste projeto escolhendo padrões arquiteturais que se encaixem a ele
-(ex.: Camadas, Pipe-and-Filters, Client-Server, Peer-to-Peer, Microservices, Blockchain, SOA, Publish-Subscribe, Shared-Data, Blackboard).
+Analyze the following software repository artifacts:
+1. The folder structure (File Tree);
+2. The package.json file;
+3. The commit history (last 100 commits).
 
-IMPORTANTE:
-Você DEVE fornecer 5 palpites diferentes, com uma porcentagem de confiança para cada um.
+TASK:
+Identify which architectural patterns are present in the analyzed repository.
+(Examples of architectural patterns: Layered Architecture, Client-Server, Microservices, Monolithic, Pipe-and-Filters, Event-Driven Architecture, Service-Oriented Architecture (SOA), Peer-to-Peer (P2P), Blackboard, Hexagonal Architecture (Ports and Adapters), Clean Architecture, Serverless, MVC (Model-View-Controller), CQRS, Microkernel (Plug-ins), Broker Pattern, Master-Slave).
 
-Siga ESTRITAMENTE este formato de resposta:
+Provide 5 predictions with associated probability percentages.
 
-1. [Nome do Padrão] - [XX]%
-   Justificativa: [Explicação baseada em pastas específicas]
+STRICTLY follow this format:
+1. [Pattern Name] - [XX]%
+   Justification: [Explanation for the prediction based on the artifacts]
 
-2. [Nome do Padrão] - [XX]%
-   Justificativa: [...]
-
-(Repita até o 5)
-
---- INÍCIO DA TREE ---
+--- START OF TREE ---
 {}
---- FIM DA TREE ---
+--- END OF TREE ---
 
---- INÍCIO DOS READMES ---
+--- START OF PACKAGE.JSON ---
 {}
---- FIM DOS READMES ---
+--- END OF PACKAGE.JSON ---
+
+--- START OF COMMIT HISTORY ---
+{}
+--- END OF COMMIT HISTORY ---
 """
 
 """Por fim, executamos o modelo e esperamos pelo resultado da análise (aprox. 40s)"""
 
 repo_path = "./anything-llm"
-tree_visual = gerar_arvore_diretorios(repo_path)
-readmes_content = extrair_resumo_readmes(repo_path)
-
-print(f"Estrutura capturada (primeiras 10 linhas):\n{'\n'.join(tree_visual.splitlines()[:10])}...\n")
 
 print("Aguardando análise do modelo...")
 
-# Caminho absoluto onde o script está
-base_dir = os.path.dirname(os.path.abspath(__file__))
+start = time.perf_counter()
+resultado = inferir_arquitetura_pela_tree(prompt.format(input[3], input[1], input[2]))
+end = time.perf_counter()
 
-# Pastas finais
-entradas_dir = os.path.join(base_dir, "entradas")
-respostas_dir = os.path.join(base_dir, "respostas")
+tempo_execucao = end-start
 
-# Garantir que existem
-os.makedirs(entradas_dir, exist_ok=True)
-os.makedirs(respostas_dir, exist_ok=True)
+clear_output(wait=True)
 
-for a in range(1, 5):
-    start = time.perf_counter()
-    
-    resultado = inferir_arquitetura_pela_tree(
-        tree_visual,
-        prompt.format(tree_visual, readmes_content)
-    )
-    
-    end = time.perf_counter()
-    tempo_execucao = end - start
+print("Análise gerada:\n")
+print(f"Tempo de execução = {tempo_execucao}s\n")
 
-    # Caminhos corretos para os arquivos
-    input_path = os.path.join(entradas_dir, f"entrada{a}.txt")
-    output_path = os.path.join(respostas_dir, f"resposta{a}.txt")
+with open(f"output.txt", 'w') as f:
+  f.write(resultado)
 
-    # Salvar entrada
-    with open(input_path, 'w', encoding='utf-8') as f:
-        f.write(tree_visual)
-        f.write(readmes_content)
+"""Fazer download das entradas e saídas"""
 
-    # Salvar resposta
-    with open(output_path, 'w', encoding='utf-8') as f:
-        f.write(f"TEMPO_DE_EXECUCAO={tempo_execucao}\n")
-        f.write(resultado)
+from google.colab import files
 
-    print(f"🟢 Salvo: {output_path}")
+files.download("output.txt")
