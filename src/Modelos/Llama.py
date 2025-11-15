@@ -49,13 +49,11 @@ def executarModelo(input_text):
 
 
 
-# Caminho do modelo
-#model_path = "Qwen/Qwen2.5-Coder-1.5B-Instruct"
-#model_path = ""  # Modelo no huggingface
-#model_path = r"D:\Windows 3.0\Downloads\Teste 1\Llama-3.2-1B-Instruct" 
+
 model_path = "meta-llama/Llama-3.2-1B-Instruct"
 # Utilizei um modelo baixado localmente, altere caso o modelo 
-# esteja em outro diretorio ou no huggingface
+# precise ser baixado do Huggingface, ou caso o modelo
+# é preciso solicitar a autorização da meta para uso
 
 print("Carregando modelo", model_path)
 device = "cpu"

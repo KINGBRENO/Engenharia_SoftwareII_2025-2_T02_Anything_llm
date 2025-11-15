@@ -18,8 +18,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 URL_REPO = "https://github.com/Mintplex-Labs/anything-llm.git"
 BRANCH = "master"
 LIMITE_CARACTERES = 3000
-ARQUIVO_SAIDA = os.path.join(BASE_DIR, "BART_CNN+MNLI.json")
-ARQUIVO_SAIDA_TXT = os.path.join(BASE_DIR, "..", "..", "resultados", "BART_CNN+MNLI.txt")
+ARQUIVO_SAIDA_TXT = os.path.join(BASE_DIR, "..", "..", "resultados", "bart_cnn+mnli.txt")
 
 PADROES = [
     "Client-Server (a centralized server provides resources or services to multiple clients over a network)",
@@ -38,22 +37,24 @@ PADROES = [
 # =========================
 # BAIXAR REPOSITÓRIO
 # =========================
+# pasta um nível acima
+repo_dir = os.path.normpath(os.path.join(BASE_DIR, "..", "anything-llm"))
 
+if not os.path.exists(repo_dir):
+    print("📁 Repositório não encontrado. Clonando...")
+    try:
+        git.Repo.clone_from(URL_REPO, repo_dir, branch=BRANCH)
+        print(f"✔️ Repositório clonado em: {repo_dir}")
+    except Exception as e:
+        print(f"❌ Erro ao clonar o repositório: {e}")
+        exit()
+else:
+    print(f"📂 Repositório já existe em: {repo_dir}")
+    print("✔️ Usando versão local.\n")
 
-print("⬇️ Baixando repositório para análise...")
-
-temp_dir = tempfile.mkdtemp(prefix="repo_")
-repo_path = os.path.join(temp_dir, "repo")
-
-try:
-    repo = git.Repo.clone_from(URL_REPO, repo_path, branch=BRANCH)
-    print(f"📁 Repositório clonado em: {repo_path}")
-except Exception as e:
-    print(f"❌ Erro ao clonar o repositório: {e}")
-    exit()
 
 # Caminho usado no os.walk
-CAMINHO_REPO = repo_path
+CAMINHO_REPO = repo_dir
 
 # =========================
 # MODELOS
@@ -107,11 +108,11 @@ for raiz, _, arquivos in os.walk(CAMINHO_REPO):
                 conteudo = f.read()
 
             conteudo_limpo = limpar_markdown(conteudo)
-
-            with open("entradas_processadas.txt", "a", encoding="utf-8") as entrada_saida:
-                entrada_saida.write(f"\n\n===== {caminho} =====\n")
-                entrada_saida.write(conteudo_limpo)
-                entrada_saida.write("\n")
+            
+            #with open("entradas_processadas.txt", "a", encoding="utf-8") as entrada_saida:
+            #    entrada_saida.write(f"\n\n===== {caminho} =====\n")
+            #    entrada_saida.write(conteudo_limpo)
+            #    entrada_saida.write("\n")
 
             if not conteudo_limpo.strip():
                 print("⚪ Ignorado (sem conteúdo relevante)")
@@ -208,24 +209,7 @@ print(f"📄 TXT salvo em: {ARQUIVO_SAIDA_TXT}")
 tempo_execucao = time.perf_counter() - tempo_execucao    
 
 print("\n✅ Análise concluída!")
-print(f"📁 Resultados salvos em: {ARQUIVO_SAIDA_TXT} {ARQUIVO_SAIDA}")
+print(f"📁 Resultados salvos em: {ARQUIVO_SAIDA_TXT} {ARQUIVO_SAIDA_TXT}")
 
 print(f"⏱️ Tempo de execução {tempo_execucao}")
 
-import stat
-
-def remover_arquivo_protegido(func, path, excinfo):
-    os.chmod(path, stat.S_IWRITE)
-    func(path)
-
-# Fechar o repositório antes de remover
-try:
-    repo.close()
-except:
-    pass
-
-try:
-    shutil.rmtree(temp_dir, onerror=remover_arquivo_protegido)
-    print("🗑️ Repositório temporário removido com sucesso.")
-except Exception as e:
-    print(f"⚠️ Falha ao remover repositório temporário: {e}")

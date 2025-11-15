@@ -1,6 +1,0 @@
-# Padrões Arquiteturais Identificados
-
-## LLM Integration Pattern
-Probabilidade média: 21.8%
-Fontes: entrada4.txt
-

@@ -12,11 +12,22 @@ import time
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
+import torch
 
 # Configurações do projeto
-INPUT_FILES = ["../entradas/entrada1.txt"]
-OUTPUT_FILE = "resposta1.txt"
-ARQUIVOS_ANALISADOS_FILE = "arquivos_analisados.txt"
+
+
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+ARQUIVO_SAIDA_TXT = os.path.join(BASE_DIR, "..", "..", "resultados", "allminilm_l6_v2.txt")
+entradas_dir = os.path.abspath(os.path.join(BASE_DIR, "..", "..", "entradas"))
+os.makedirs(entradas_dir, exist_ok=True)
+ARQUIVO_ENTRADA_TXT = os.path.join(entradas_dir, "entrada1.txt")
+
+INPUT_FILES = [ARQUIVO_ENTRADA_TXT]
+OUTPUT_FILE = os.path.join(BASE_DIR, "..", "..", "resultados", "all_minilm_l6_v2.txt")
+
 
 # Padrões arquiteturais EXPANDIDOS e MELHORADOS
 ARCHITECTURAL_PATTERNS = [
@@ -46,7 +57,12 @@ ARCHITECTURAL_PATTERNS = [
 ]
 
 # Carregar modelo de embeddings
-model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
+device = "cuda" if torch.cuda.is_available() else "cpu"
+print("Usando dispositivo:", device)
+model = SentenceTransformer(
+    'sentence-transformers/all-MiniLM-L6-v2',
+    device=device
+)
 
 def load_input_files():
     """Carrega os arquivos de entrada especificados"""
@@ -74,7 +90,7 @@ def load_input_files():
 
 def save_arquivos_analisados(files_data):
     """Salva a lista de arquivos que serão analisados em um txt"""
-    with open(ARQUIVOS_ANALISADOS_FILE, 'w', encoding='utf-8') as f:
+    with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
         f.write("# Arquivos Selecionados para Análise\n\n")
 
         f.write("## Arquivos de Entrada Analisados\n")
@@ -150,13 +166,20 @@ def main():
     # Dicionário: padrão → ocorrências
     grouped_patterns = {}
 
-    # Processar cada arquivo
     for file_info in files_data:
         file_name = file_info['name']
         content = file_info['content']
 
+        # IMPRIMIR CONTEÚDO DA ENTRADA
+        print("\n===== CONTEÚDO DO ARQUIVO DE ENTRADA =====")
+        print(f"Arquivo: {file_name}")
+        print("------------------------------------------")
+        print(content[:3000])  # imprime até 3000 caracteres para segurança
+        print("------------------------------------------\n")
+
         # aplicar melhoria de contexto
         enhanced_content = enhance_content_analysis(content, file_name)
+
 
         # encontrar padrões
         patterns = analyze_content(enhanced_content, pattern_embeddings)
@@ -225,7 +248,7 @@ def main():
     total = time.perf_counter() - start_time
     print(f"\nTempo total: {total:.2f} segundos")
     print(f"Relatório salvo em: {OUTPUT_FILE}")
-    print(f"Arquivos analisados em: {ARQUIVOS_ANALISADOS_FILE}")
+    print(f"Arquivos analisados em: {OUTPUT_FILE}")
 
 # Executar a análise
 if __name__ == "__main__":

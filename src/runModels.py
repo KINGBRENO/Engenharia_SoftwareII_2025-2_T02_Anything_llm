@@ -2,20 +2,50 @@ import os
 import sys
 import subprocess
 import time
+from git import Repo
+
+
+repo_url = "https://github.com/Mintplex-Labs/anything-llm"
+repo_dir = "anything-llm"
+if not os.path.exists(repo_dir):
+    print("Clonando repositório...")
+    Repo.clone_from(repo_url, repo_dir)
+    print("Clone concluído!\n")
+else:
+    print("Repositório já existe. Usando versão local.\n")
+
 
 # ===========================================
 # CONFIGURAÇÃO DOS SCRIPTS DOS MODELOS
 # ===========================================
 
+import os
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-os.makedirs(os.path.join(BASE_DIR, "resultados"), exist_ok=True)
+# Criar a pasta 'resultados' UM NÍVEL ACIMA DA SRC
+RESULTADOS_DIR = os.path.normpath(os.path.join(BASE_DIR, "..", "resultados"))
+os.makedirs(RESULTADOS_DIR, exist_ok=True)
+
+# Caminho base da pasta Modelos
+MODELOS_DIR = os.path.join(BASE_DIR, "Modelos")
+
 MODEL_SCRIPTS = {
-    "1": ("BART (bart-large-cnn + bart-large-mnli)", os.path.join(BASE_DIR, "Modelos/BART_CNN+MNLI.py")), # OK
-    "2": ("LLaMA", "/Modelos/llama.py"),
-    "3": ("Qwen", "/Modelos/qwen.py"),
-    "4": ("Mistral", "/Modelos/mistral.py"),
-    "5": ("T5", "/Modelos/modelo_t5.py"),
+    "1": ("BART (bart-large-cnn + bart-large-mnli)",
+          os.path.join(MODELOS_DIR, "bart_cnn+mnli.py")),
+
+    "2": ("LLaMA",
+          os.path.join(MODELOS_DIR, "llama.py")),
+
+    "3": ("Qwen",
+          os.path.join(MODELOS_DIR, "qwen.py")),
+
+    "4": ("Bart_MNLM",
+          os.path.join(MODELOS_DIR, "bart_mnli.py")),
+
+    "5": ("All-MiniLM-L6-v2",
+          os.path.join(MODELOS_DIR, "all_minilm_l6_v2.py")),
+
     "0": ("Sair", None)
 }
 
