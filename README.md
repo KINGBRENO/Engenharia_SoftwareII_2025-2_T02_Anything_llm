@@ -112,6 +112,13 @@ Este projeto foi executado com os seguintes recursos:
 - RAM: **32 GB**
 - Ambiente Python 3.12
 
+Os modelos foram rodados individualmente no google Colab utilizando um plano gratuito com a seguinte configuração:
+
+- System RAM: 12.7 GB
+- GPU: T4 GPU
+- GPU RAM: 15.0 GB
+- Ambiente Python 3.12
+
 > A infraestrutura é importante pois modelos maiores podem estourar a memória em máquinas com menos recursos
 
 ---
