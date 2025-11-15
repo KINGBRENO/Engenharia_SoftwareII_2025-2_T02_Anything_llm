@@ -9,10 +9,6 @@ A equipe desenvolveu um pipeline automatizado capaz de:
 - Comparar a eficácia dos modelos;
 - Gerar resultados reproducíveis em JSON/CSV.
 
-# Repositório alvo análisado
-O Anything LLM é uma plataforma open source que permite criar assistentes de IA capazes de conversar com usuários e compreender documentos, integrando grandes modelos de linguagem com bases de conhecimento locais. Ela transforma arquivos e textos em dados pesquisáveis, possibilitando que o chatbot responda com base nesses conteúdos e até execute tarefas automatizadas por meio de agentes de IA. Pode ser usada localmente ou via servidor, oferecendo flexibilidade, privacidade e personalização para empresas e desenvolvedores que desejam construir seus próprios sistemas de chat inteligentes.
-
-
 ---
 
 ## 📌 1. Projeto Analisado
@@ -68,7 +64,7 @@ Cada modelo recebeu como entrada fragmentos do projeto alvo e produziu como saí
 - Justificativa textual
 - Relações arquiteturais
 
-Os Resultados estão disponíveis em `resultados`.
+Os resultados estão disponíveis em `resultados`.
 
 ## 📌 4. Requisitos do Sistema
 ### ✔️ Dependências
@@ -93,7 +89,7 @@ Este projeto foi executado com os seguintes recursos:
 - RAM: **32 GB**
 - Ambiente Python 3.12
 
-> A infraestrutura é importante pois modelos maiores podem estourar a memória
+> A infraestrutura é importante pois modelos maiores podem estourar a memória em máquinas com menos recursos
 
 ---
 
@@ -119,7 +115,7 @@ Este script realiza:
 2. Extração de arquivos relevantes;
 3. Processamento e limpeza;
 4. Execução dos modelos Hugging Face;
-5. Salvamento dos resultados em `Resultados/`.
+5. Salvamento dos resultados em `resultados/`.
 
 ---
 
@@ -146,7 +142,7 @@ Ele contém:
 - Conclusões
 
 ## 📌 8. Equipe
-baixo está a tabela detalhada de contribuição dos integrantes:
+Abaixo está a tabela detalhada de contribuição dos integrantes:
 
 | Nome                                   | Matrícula    | Contribuição                                                                                                |
 | -------------------------------------- | ------------ | ----------------------------------------------------------------------------------------------------------- |
