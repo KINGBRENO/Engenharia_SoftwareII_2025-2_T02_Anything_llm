@@ -9,6 +9,10 @@ A equipe desenvolveu um pipeline automatizado capaz de:
 - Comparar a eficácia dos modelos;
 - Gerar resultados reproducíveis em JSON/CSV.
 
+# Repositório alvo análisado
+O Anything LLM é uma plataforma open source que permite criar assistentes de IA capazes de conversar com usuários e compreender documentos, integrando grandes modelos de linguagem com bases de conhecimento locais. Ela transforma arquivos e textos em dados pesquisáveis, possibilitando que o chatbot responda com base nesses conteúdos e até execute tarefas automatizadas por meio de agentes de IA. Pode ser usada localmente ou via servidor, oferecendo flexibilidade, privacidade e personalização para empresas e desenvolvedores que desejam construir seus próprios sistemas de chat inteligentes.
+
+
 ---
 
 ## 📌 1. Projeto Analisado
