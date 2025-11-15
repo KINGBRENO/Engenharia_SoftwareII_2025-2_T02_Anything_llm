@@ -98,9 +98,7 @@ with open(ARQUIVO_ENTRADA_TXT, "r", encoding="utf-8") as f:
    """
    prompt2 = ''
    print(prompt)
-
-   os.makedirs("respostas", exist_ok=True)
-
+   
    arquivo = ARQUIVO_SAIDA_TXT
 
 
