@@ -1,5 +1,18 @@
 # Anything-LLM – Análise de Padrões Arquiteturais
 
+## 📌 1. Equipe
+Abaixo está a tabela detalhada de contribuição dos integrantes:
+
+| Nome                                   | Matrícula    | Contribuição                                                                                                |
+| -------------------------------------- | ------------ | ----------------------------------------------------------------------------------------------------------- |
+| **Breno Henrique Do Carmo Santos**     | 202200078737 | Pesquisa, teste de modelos, padronização dos modelos, elaboração do tutorial e edição do vídeo e documento. |
+| **Carla Stefany R. Santos**            | 202400060148 | Pesquisa, teste de modelos, elaboração do tutorial, edição e formatação do documento.                       |
+| **Fernanda Karoliny Santos Silva**     | 202200092431 | Pesquisa, edição do documento, formatação do documento.                                                     |
+| **João Paulo Menezes Machado**         | 202300038743 | Pesquisa, análise do projeto, edição do documento.                                                          |
+| **João Vinícius De Almeida Argolo**    | 202200025573 | Pesquisa, teste de modelos, elaboração do tutorial e edição do documento.                                   |
+| **José Arthur Calixto Da Rocha Costa** | 202300038770 | Pesquisa, teste de modelos, elaboração do tutorial e edição do documento.                                   |
+| **Vinícius Azevedo Peroba**            | 201900076892 | Pesquisa, análise do projeto, apuração dos testes, edição do documento.                                     |
+
 Este repositório contém a implementação completa da Atividade 1 de Engenharia de Software II (2025.2), cujo objetivo é **analisar padrões arquiteturais ao longo da evolução de um projeto real do GitHub utilizando modelos de linguagem (LLMs)**.
 
 A equipe desenvolveu um pipeline automatizado capaz de:
@@ -11,7 +24,7 @@ A equipe desenvolveu um pipeline automatizado capaz de:
 
 ---
 
-## 📌 1. Projeto Analisado
+## 📌 2. Projeto Analisado
 
 Este estudo utiliza como alvo o repositório:
 > **[Anything-LLM](https://github.com/Mintplex-Labs/anything-llm)**
@@ -26,7 +39,7 @@ O projeto foi escolhido por apresentar:
 
 ---
 
-## 📌 2. Estrutura do Repositório
+## 📌 3. Estrutura do Repositório
 ```
 ├── entradas/            # Arquivos de entrada utilizados pela equipe
 │
@@ -48,7 +61,7 @@ O projeto foi escolhido por apresentar:
 └── README.md            # Este documento
 
 ```
-## 📌 3. Modelos Utilizados
+## 📌 4. Modelos Utilizados
 O estudo utilizou **cinco modelos** do Hugging Face para ampliar a diversidade de análise:
 
 Modelos utilizados:
@@ -66,7 +79,7 @@ Cada modelo recebeu como entrada fragmentos do projeto alvo e produziu como saí
 
 Os resultados estão disponíveis em `resultados`.
 
-## 📌 4. Requisitos do Sistema
+## 📌 5. Requisitos do Sistema
 ### ✔️ Dependências
 Instale todas as dependências com:
 ```
@@ -93,7 +106,7 @@ Este projeto foi executado com os seguintes recursos:
 
 ---
 
-## 📌 5. Como Executar o Projeto
+## 📌 6. Como Executar o Projeto
 ### **1️⃣ Clonar o repositório**
 ```
 git clone https://github.com/FernandaKaroliny/Engenharia_SoftwareII_2025-2_T02_Anything_llm
@@ -119,7 +132,7 @@ Este script realiza:
 
 ---
 
-## 📌 6. Resultados
+## 📌 7. Resultados
 Os resultados são gerados automaticamente após a escolha do modelo:
 - `resultados` → Lista de padrões arquiteturais detectados
 
@@ -129,7 +142,7 @@ Além disso, o PDF do tutorial contém uma análise aprofundada, incluindo:
 
 ---
 
-## 📌 7. Tutorial (Documento Escrito)
+## 📌 8. Tutorial (Documento Escrito)
 O arquivo PDF completo está em:
 ```
 docs/tutorial.pdf
@@ -141,18 +154,7 @@ Ele contém:
 - Discussão dos padrões identificados
 - Conclusões
 
-## 📌 8. Equipe
-Abaixo está a tabela detalhada de contribuição dos integrantes:
 
-| Nome                                   | Matrícula    | Contribuição                                                                                                |
-| -------------------------------------- | ------------ | ----------------------------------------------------------------------------------------------------------- |
-| **Breno Henrique Do Carmo Santos**     | 202200078737 | Pesquisa, teste de modelos, padronização dos modelos, elaboração do tutorial e edição do vídeo e documento. |
-| **Carla Stefany R. Santos**            | 202400060148 | Pesquisa, teste de modelos, elaboração do tutorial, edição e formatação do documento.                       |
-| **Fernanda Karoliny Santos Silva**     | 202200092431 | Pesquisa, edição do documento, formatação do documento.                                                     |
-| **João Paulo Menezes Machado**         | 202300038743 | Pesquisa, análise do projeto, edição do documento.                                                          |
-| **João Vinícius De Almeida Argolo**    | 202200025573 | Pesquisa, teste de modelos, elaboração do tutorial e edição do documento.                                   |
-| **José Arthur Calixto Da Rocha Costa** | 202300038770 | Pesquisa, teste de modelos, elaboração do tutorial e edição do documento.                                   |
-| **Vinícius Azevedo Peroba**            | 201900076892 | Pesquisa, análise do projeto, apuração dos testes, edição do documento.                                     |
 | **Wendel Alexsander Gomes Menezes**    | 202300027740 | Pesquisa, análise do projeto, apuração dos testes, edição do documento.                                     |
 ---
 
