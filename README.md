@@ -16,8 +16,11 @@ O Anything LLM é uma plataforma open source que permite criar assistentes de IA
 ---
 
 ## 📌 1. Projeto Analisado
+
 Este estudo utiliza como alvo o repositório:
 > **[Anything-LLM](https://github.com/Mintplex-Labs/anything-llm)**
+
+O Anything LLM é uma plataforma open source que permite criar assistentes de IA capazes de conversar com usuários e compreender documentos, integrando grandes modelos de linguagem com bases de conhecimento locais. Ela transforma arquivos e textos em dados pesquisáveis, possibilitando que o chatbot responda com base nesses conteúdos e até execute tarefas automatizadas por meio de agentes de IA. Pode ser usada localmente ou via servidor, oferecendo flexibilidade, privacidade e personalização para empresas e desenvolvedores que desejam construir seus próprios sistemas de chat inteligentes.
 
 O projeto foi escolhido por apresentar:
 - Estrutura modular clara;
