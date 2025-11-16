@@ -65,7 +65,7 @@ O projeto foi escolhido por apresentar:
 │   └── all_minilm_l6_v2.txt
 │
 ├── docs/                # Documentação do projeto
-│   └── tutorial.pdf
+│   └── Breno_Henrique_Carla_Stefany_Fernanda_Karoliny_João_Paulo_José_Arthur_Vinicius_Azevedo_Wendel_Alexsander_Atividade_1.pdf
 │
 ├── requirements.txt     # Dependências do projeto
 └── README.md            # Este documento
